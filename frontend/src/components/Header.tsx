@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logoImg from "../assets/images/Carriya logo 1.png";
 import searchIcon from "../assets/images/searchicon.png";
 import favIcon from "../assets/images/Favourite Products icon.png";
@@ -6,6 +7,7 @@ import cartIcon from "../assets/images/Cart icon.png";
 import userIcon from "../assets/images/account.png";
 import menuIcon from "../assets/images/MENU.png";
 import CategoryMenu from "./CategoryMenu";
+import { useCart } from "../contexts/CartContext";
 
 export type HeaderProps = {
   variant?: 'simple' | 'full';
@@ -14,6 +16,9 @@ export type HeaderProps = {
 function Header({ variant = 'simple' }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { getItemCount } = useCart();
+  const navigate = useNavigate();
+  const cartItemCount = getItemCount();
 
   return (
     <header className="w-full">
@@ -65,15 +70,20 @@ function Header({ variant = 'simple' }: HeaderProps) {
                 />
               </button>
 
-              <button className="relative p-1.5 md:p-2 hover:bg-gray-100 rounded-lg">
+              <button 
+                onClick={() => navigate('/cart')}
+                className="relative p-1.5 md:p-2 hover:bg-gray-100 rounded-lg"
+              >
                 <img
                   src={cartIcon}
                   alt="Cart"
                   className="w-5 h-5 md:w-6 md:h-6 object-contain"
                 />
-                <span className="absolute -top-1 -right-1 bg-carriya-green text-white text-[10px] md:text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
-                  0
-                </span>
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-carriya-green text-white text-[10px] md:text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
+                    {cartItemCount}
+                  </span>
+                )}
               </button>
 
               <div className="hidden md:flex items-center space-x-2">

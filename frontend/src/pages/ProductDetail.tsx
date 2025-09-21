@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import Stars from '../components/product/Stars';
 import saleIcon from '../assets/images/Icon (Stroke).png';
 import cartIcon from '../assets/images/Cart.png';
+import { useCart } from '../contexts/CartContext';
 
 // Dummy data builder matching Figma exactly
 function useDummyProduct(id: string) {
@@ -56,6 +57,7 @@ const ProductDetail: React.FC = () => {
   const { productId = '1' } = useParams();
   const product = useDummyProduct(productId);
   const navigate = useNavigate();
+  const { addItem } = useCart();
   const [showAddToast, setShowAddToast] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [cartDetails, setCartDetails] = useState<{ quantity: number; color?: string; size?: string } | null>(null);
@@ -118,7 +120,20 @@ const ProductDetail: React.FC = () => {
             reviews={product.reviews}
             colors={product.colors}
             sizes={product.sizes}
-            onAddToCart={(d) => { setCartDetails(d); setShowAddToast(true); }}
+            onAddToCart={(d) => { 
+              addItem({
+                title: product.title,
+                image: product.images[0],
+                price: product.price,
+                compareAt: product.compareAt,
+                color: d.color,
+                size: d.size,
+                qty: d.quantity,
+                shopName: 'My Shop'
+              });
+              setCartDetails(d); 
+              setShowAddToast(true); 
+            }}
             />
           </div>
         </div>
@@ -275,7 +290,22 @@ const ProductDetail: React.FC = () => {
               </div>
 
               <div className="flex justify-end">
-              <button className=" flext-0.5 h-11 bg-[#2ECC71]  text-white rounded-[10px] font-medium flex items-center justify-end gap-2 px-4" onClick={() => setShowAddToast(true)}>
+              <button 
+                className=" flext-0.5 h-11 bg-[#2ECC71]  text-white rounded-[10px] font-medium flex items-center justify-end gap-2 px-4" 
+                onClick={() => {
+                  addItem({
+                    title: product.title,
+                    image: product.images[0],
+                    price: product.price,
+                    compareAt: product.compareAt,
+                    color: mobileSelectedColor,
+                    size: mobileSelectedSize,
+                    qty: mobileQuantity,
+                    shopName: 'My Shop'
+                  });
+                  setShowAddToast(true);
+                }}
+              >
                 <span>Add to cart</span>
                 <img src={cartIcon} alt="" className="w-5 h-5 object-contain" />
               </button>
