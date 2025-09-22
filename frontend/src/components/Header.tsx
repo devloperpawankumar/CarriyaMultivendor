@@ -136,9 +136,19 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
               {/* Action Buttons */}
               <div className="flex items-center space-x-3">
-                <button className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100">Sign-Up</button>
+                <button 
+                  onClick={() => navigate('/signup')}
+                  className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100"
+                >
+                  Sign-Up
+                </button>
                 <button className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100">Log-In</button>
-                <button className="bg-carriya-dark text-white px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-800">Become a seller</button>
+                <button 
+                  onClick={() => navigate('/seller-signup')}
+                  className="bg-carriya-dark text-white px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-800"
+                >
+                  Become a seller
+                </button>
               </div>
             </div>
 
@@ -208,11 +218,25 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
               {/* Footer Buttons immediately after links */}
               <div className="pt-4 border-t">
-                <a href="#" className="text-green-600 font-medium">
+                <a
+                  href="/signup"
+                  className="text-green-600 font-medium"
+                  onClick={e => {
+                    e.preventDefault();
+                    window.location.href = '/signup';
+                  }}
+                >
                   Sign in
                 </a>
                 <span className="mx-1">or</span>
-                <a href="#" className="text-green-600 font-medium">
+                <a
+                  href="/signup"
+                  className="text-green-600 font-medium"
+                  onClick={e => {
+                    e.preventDefault();
+                    window.location.href = '/signup';
+                  }}
+                >
                   Register
                 </a>
               </div>

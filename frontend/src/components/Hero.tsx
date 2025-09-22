@@ -1,9 +1,9 @@
 import React from "react";
 import logo from "../assets/images/Carriya logo 1.png";
-import electronics from "../assets/images/pexels-pixabay-356056.jpg";
-import appliances from "../assets/images/pexels-pixabay-356056.jpg";
-import model1 from "../assets/images/pexels-pixabay-356056.jpg";
-import model2 from "../assets/images/pexels-pixabay-356056.jpg";
+import electronics from "../assets/images/banner/banner images.jpg";
+import appliances from "../assets/images/banner/banner image 2.jpg";
+import model1 from "../assets/images/banner/banner image 3.jpg";
+import model2 from "../assets/images/banner/banner image 4.jpg";
 import heart from "../assets/images/Heart.png";
 import banner from "../assets/images/bannerhero.png";
 
