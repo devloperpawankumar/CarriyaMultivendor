@@ -5,10 +5,14 @@ const Gallery: React.FC<{ images: string[] }> = ({ images }) => {
   const prev = () => setIndex(i => (i - 1 + images.length) % images.length);
   const next = () => setIndex(i => (i + 1) % images.length);
 
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   return (
     <div>
       <div className="relative w-full h-[321px] md:aspect-square overflow-hidden bg-[#C7FFDF] md:border md:border-[#2ECC71] flex items-center justify-center">
-        <img src={images[index]} alt="Product" className="h-full w-full object-contain" />
+        <button onClick={() => setLightboxOpen(true)} className="w-full h-full">
+          <img src={images[index]} alt="Product" className="h-full w-full object-contain" />
+        </button>
 
         {/* Desktop arrows */}
         <button
@@ -77,6 +81,11 @@ const Gallery: React.FC<{ images: string[] }> = ({ images }) => {
           </button>
         ))}
       </div>
+      {lightboxOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setLightboxOpen(false)}>
+          <img src={images[index]} alt="Preview" className="max-h-[90vh] max-w-[90vw] object-contain" />
+        </div>
+      )}
     </div>
   );
 };

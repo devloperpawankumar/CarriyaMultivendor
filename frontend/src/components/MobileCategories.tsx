@@ -1,18 +1,29 @@
 import React from "react";
-import testImg from "../assets/images/pexels-pixabay-356056.jpg";
+
+import electronicsImg from "../assets/images/categories/category 1.jpg";
+import fashionImg from "../assets/images/categories/category 2.jpg";
+import healthImg from "../assets/images/categories/category 3.jpg";
+import homeImg from "../assets/images/categories/category 4.jpg";
+import sportsImg from "../assets/images/categories/category 5.png";
+import automotiveImg from "../assets/images/categories/category 6.png";
+import groceriesImg from "../assets/images/categories/category 7.png";
+import booksImg from "../assets/images/categories/category 8.png";
+import toysImg from "../assets/images/categories/category 9.png";
+import jewelryImg from "../assets/images/categories/category 10.png";
+import industrialImg from "../assets/images/categories/category 11.png";
 
 const categories = [
-  { name: "Electronics & Appliances", image: testImg },
-  { name: "Fashion & Apparels", image: testImg }, // fixed spelling
-  { name: "Health & Beauty", image: testImg },
-  { name: "Home living & Furniture", image: testImg },
-  { name: "Sports & Outdoor", image: testImg },
-  { name: "Automotive & Bike Accessories", image: testImg },
-  { name: "Groceries & Essentials", image: testImg },
-  { name: "Books, Stationery & Education", image: testImg },
-  { name: "Toys, Kids & Baby", image: testImg },
-  { name: "Jewelry & Watches", image: testImg },
-  { name: "Industrial & Business Supplies", image: testImg },
+  { name: "Electronics & Appliances", image: electronicsImg },
+  { name: "Fashion & Apparels", image: fashionImg }, // fixed spelling
+  { name: "Health & Beauty", image: healthImg },
+  { name: "Home living & Furniture", image: homeImg },
+  { name: "Sports & Outdoor", image: sportsImg },
+  { name: "Automotive & Bike Accessories", image: automotiveImg },
+  { name: "Groceries & Essentials", image: groceriesImg },
+  { name: "Books, Stationery & Education", image: booksImg },
+  { name: "Toys, Kids & Baby", image: toysImg },
+  { name: "Jewelry & Watches", image: jewelryImg },
+  { name: "Industrial & Business Supplies", image: industrialImg },
 ];
 
 const MobileCategories: React.FC = () => {

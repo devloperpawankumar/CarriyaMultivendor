@@ -8,6 +8,7 @@ import userIcon from "../assets/images/account.png";
 import menuIcon from "../assets/images/MENU.png";
 import CategoryMenu from "./CategoryMenu";
 import { useCart } from "../contexts/CartContext";
+import { useFavorites } from "../contexts/FavoritesContext";
 
 export type HeaderProps = {
   variant?: 'simple' | 'full';
@@ -17,6 +18,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getItemCount } = useCart();
+  const { count: favCount } = useFavorites();
   const navigate = useNavigate();
   const cartItemCount = getItemCount();
 
@@ -62,12 +64,17 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
             {/* Right Side Icons */}
             <div className="flex items-center space-x-4 md:space-x-6">
-              <button className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg">
+              <button className="relative p-1.5 md:p-2 hover:bg-gray-100 rounded-lg" onClick={() => navigate('/favorites')}>
                 <img
                   src={favIcon}
                   alt="Favorites"
                   className="w-5 h-5 md:w-6 md:h-6 object-contain"
                 />
+                {favCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-carriya-green text-white text-[10px] md:text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
+                    {favCount}
+                  </span>
+                )}
               </button>
 
               <button 

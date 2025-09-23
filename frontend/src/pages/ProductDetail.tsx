@@ -15,6 +15,7 @@ import Stars from '../components/product/Stars';
 import saleIcon from '../assets/images/Icon (Stroke).png';
 import cartIcon from '../assets/images/Cart.png';
 import { useCart } from '../contexts/CartContext';
+import { useFavorites } from '../contexts/FavoritesContext';
 
 // Dummy data builder matching Figma exactly
 function useDummyProduct(id: string) {
@@ -58,6 +59,7 @@ const ProductDetail: React.FC = () => {
   const product = useDummyProduct(productId);
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { add: addFavorite } = useFavorites();
   const [showAddToast, setShowAddToast] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [cartDetails, setCartDetails] = useState<{ quantity: number; color?: string; size?: string } | null>(null);
@@ -103,7 +105,14 @@ const ProductDetail: React.FC = () => {
           <div className="text-[35px] font-medium leading-[1.17] mb-1">
             <span className="text-black  cursor-pointer">{(product as any).category}</span>
           </div>
-          <h1 className="text-[46px] font-bold text-[#2ECC71] leading-[1.3] mb-4">{product.title}</h1>
+          <h1
+            className="text-[46px] font-bold text-[#2ECC71] leading-[1.3] mb-4 cursor-pointer"
+            onClick={() => {
+              addFavorite({ id: product.id, title: product.title, image: product.images[0] });
+            }}
+          >
+            {product.title}
+          </h1>
           <div className="w-full h-px bg-[#E5E8ED]"></div>
         </div>
 
@@ -187,7 +196,14 @@ const ProductDetail: React.FC = () => {
 
 
           {/* Title */}
-          <h1 className="text-[24px] font-bold text-[#2ECC71] leading-[1.3] mb-3">{product.title}</h1>
+          <h1
+            className="text-[24px] font-bold text-[#2ECC71] leading-[1.3] mb-3 cursor-pointer"
+            onClick={() => {
+              addFavorite({ id: product.id, title: product.title, image: product.images[0] });
+            }}
+          >
+            {product.title}
+          </h1>
 
           {/* Row: sales + stars on left, price on right (no compareAt) */}
           <div className="flex items-center justify-between mb-4">

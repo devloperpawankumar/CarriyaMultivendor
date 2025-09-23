@@ -17,6 +17,7 @@ const EmailVerificationPage = lazy(() => import('./pages/EmailVerificationPage')
 const SellerAddressSetup = lazy(() => import('./pages/SellerAddressSetup'));
 const BusinessSetup = lazy(() => import('./pages/BusinessSetup'));
 const BankVerification = lazy(() => import('./pages/BankVerification'));
+const Favorites = lazy(() => import('./pages/Favorites'));
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/checkout/review" element={<CheckoutReview />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/seller-signup" element={<SellerSignup />} />
             <Route path="/email-verification" element={<EmailVerification />} />
