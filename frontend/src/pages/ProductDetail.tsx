@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -69,6 +69,15 @@ const ProductDetail: React.FC = () => {
   const [mobileSelectedSize, setMobileSelectedSize] = useState<string | undefined>(undefined);
   const [mobileColorOpen, setMobileColorOpen] = useState(false);
   const [mobileSizeOpen, setMobileSizeOpen] = useState(false);
+
+  // Ensure page starts at top when navigating to a product
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {
+      // noop
+    }
+  }, [productId]);
 
   return (
     <div className="min-h-screen bg-white">
