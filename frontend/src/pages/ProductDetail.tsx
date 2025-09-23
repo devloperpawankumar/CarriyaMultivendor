@@ -59,7 +59,8 @@ const ProductDetail: React.FC = () => {
   const product = useDummyProduct(productId);
   const navigate = useNavigate();
   const { addItem } = useCart();
-  const { add: addFavorite } = useFavorites();
+  const { items: favoriteItems, toggle: toggleFavorite } = useFavorites();
+  const isFavorite = useMemo(() => favoriteItems.some(i => i.id === product.id), [favoriteItems, product.id]);
   const [showAddToast, setShowAddToast] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [cartDetails, setCartDetails] = useState<{ quantity: number; color?: string; size?: string } | null>(null);
@@ -106,10 +107,7 @@ const ProductDetail: React.FC = () => {
             <span className="text-black  cursor-pointer">{(product as any).category}</span>
           </div>
           <h1
-            className="text-[46px] font-bold text-[#2ECC71] leading-[1.3] mb-4 cursor-pointer"
-            onClick={() => {
-              addFavorite({ id: product.id, title: product.title, image: product.images[0] });
-            }}
+            className="text-[46px] font-bold text-[#2ECC71] leading-[1.3] mb-4 cursor-default"
           >
             {product.title}
           </h1>
@@ -196,14 +194,33 @@ const ProductDetail: React.FC = () => {
 
 
           {/* Title */}
-          <h1
-            className="text-[24px] font-bold text-[#2ECC71] leading-[1.3] mb-3 cursor-pointer"
-            onClick={() => {
-              addFavorite({ id: product.id, title: product.title, image: product.images[0] });
-            }}
-          >
-            {product.title}
-          </h1>
+          <div className="flex items-center justify-start gap-24 mb-3">
+            <h1
+              className="text-[24px] font-bold text-[#2ECC71] leading-[1.3] cursor-default"
+            >
+              {product.title}
+            </h1>
+            <button
+              type="button"
+              aria-label="Toggle favorite"
+              onClick={() => toggleFavorite({ id: product.id, title: product.title, image: product.images[0] })}
+              className={`h-10 w-7 flex items-center justify-center`}
+            >
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill={isFavorite ? '#2ECC71' : 'none'}
+                xmlns="http://www.w3.org/2000/svg"
+                stroke="#2ECC71"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </button>
+          </div>
 
           {/* Row: sales + stars on left, price on right (no compareAt) */}
           <div className="flex items-center justify-between mb-4">
