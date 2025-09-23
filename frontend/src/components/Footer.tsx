@@ -85,17 +85,17 @@ const Footer: React.FC = () => {
 
         {/* Mobile Layout - Based on Figma Design */}
         <div className="lg:hidden">
-          <div className="px-5 py-5">
+          <div className="px-[20px] py-5">
             {/* Logo Section */}
             <div className="mb-6">
-              <div className="bg-white rounded-lg p-1.5 w-[88px] h-[36px] mb-2 flex items-center justify-center">
+              <div className="bg-white rounded-[10px] w-[88px] h-[36.44px] mb-2 flex items-center justify-center">
                 <img
                   src={Footerlogo}
                   alt="Carriya Logo"
-                  className="w-[82px] h-[26px] object-contain"
+                  className="w-[82.16px] h-[26.03px] object-contain"
                 />
               </div>
-              <p className="text-white text-xs leading-tight">
+              <p className="text-white/80 text-[7px] leading-[1.364]">
                 Carriya Buy , Sell And Carry
               </p>
             </div>
@@ -104,8 +104,8 @@ const Footer: React.FC = () => {
             <div className="grid grid-cols-3 gap-6 mb-8">
               {/* Company Column */}
               <div>
-                <h3 className="text-white font-bold text-sm mb-3">Company</h3>
-                <ul className="space-y-2 text-xs text-white/80">
+                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3">Company</h3>
+                <ul className="space-y-2 text-[10px] leading-[1.364] text-white/80">
                   <li><a href="#" className="hover:underline">Blog</a></li>
                   <li><a href="#" className="hover:underline">About Us</a></li>
                   <li><a href="#" className="hover:underline">Contact Us</a></li>
@@ -114,8 +114,8 @@ const Footer: React.FC = () => {
 
               {/* Information Column */}
               <div>
-                <h3 className="text-white font-bold text-sm mb-3">Information</h3>
-                <ul className="space-y-2 text-xs text-white/80">
+                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3">Information</h3>
+                <ul className="space-y-2 text-[10px] leading-[1.364] text-white/80">
                   <li><a href="#" className="hover:underline">Help Center</a></li>
                   <li><a href="#" className="hover:underline">Return & Refund</a></li>
                   <li><a href="#" className="hover:underline">Become a seller</a></li>
@@ -124,33 +124,33 @@ const Footer: React.FC = () => {
 
               {/* Contact Us Column */}
               <div>
-                <h3 className="text-white font-bold text-sm mb-3">Contact Us</h3>
-                <div className="space-y-2 text-xs text-white/80">
+                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3">Contact Us</h3>
+                <div className="space-y-2 text-[10px] leading-[1.364] text-white/80">
                   <div className="flex items-center gap-2">
-                    <img src={phoneIcon} alt="Phone" className="w-3 h-3" />
-                    <span>+92 31045</span>
+                    <img src={phoneIcon} alt="Phone" className="w-[13px] h-[13px]" />
+                    <span>+92 3146-045</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <img src={mailIcon} alt="Email" className="w-3 h-3" />
-                    <span>info@carriya.com</span>
+                    <img src={mailIcon} alt="Email" className="w-[13px] h-[13px]" />
+                    <span>info@carryia.com</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Social Media Icons */}
-            <div className="flex gap-2">
-              <a href="#" className="bg-white rounded-lg p-1.5 w-6 h-6 flex items-center justify-center">
-                <img src={Instagram} alt="Instagram" className="w-4 h-4" />
+            <div className="flex gap-[13px]">
+              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center">
+                <img src={Instagram} alt="Instagram" className="w-[14.64px] h-[14.64px]" />
               </a>
-              <a href="#" className="bg-white rounded-lg p-1.5 w-6 h-6 flex items-center justify-center">
-                <img src={Twitter} alt="Twitter" className="w-4 h-4" />
+              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center">
+                <img src={Twitter} alt="Twitter" className="w-[14.64px] h-[14.64px]" />
               </a>
-              <a href="#" className="bg-white rounded-lg p-1.5 w-6 h-6 flex items-center justify-center">
-                <img src={Facebook} alt="Facebook" className="w-4 h-4" />
+              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center">
+                <img src={Facebook} alt="Facebook" className="w-[14.64px] h-[14.64px]" />
               </a>
-              <a href="#" className="bg-white rounded-lg p-1.5 w-6 h-6 flex items-center justify-center">
-                <img src={Youtube} alt="YouTube" className="w-4 h-4" />
+              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center">
+                <img src={Youtube} alt="YouTube" className="w-[14.64px] h-[14.64px]" />
               </a>
             </div>
           </div>
@@ -196,7 +196,7 @@ const Footer: React.FC = () => {
         <div className="lg:hidden">
           <div className="px-5 py-3">
             <div className="text-xs text-white/70 text-center">
-              Copyright © 2025 Carriya. All Right Reserved
+              
             </div>
           </div>
         </div>

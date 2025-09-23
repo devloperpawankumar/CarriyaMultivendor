@@ -4,9 +4,26 @@ import Footer from '../components/Footer';
 import CategoryMenu from '../components/CategoryMenu';
 import homeIcon from '../assets/images/Payment/Frame (2).png';
 import officeIcon from '../assets/images/Payment/Frame (3).png';
+import arrowIcon from '../assets/images/Product/_.png';
+import locations from '../data/locations';
 
 const Checkout: React.FC = () => {
   const [showCategories, setShowCategories] = useState(false);
+ 
+
+  const [province, setProvince] = useState('');
+  const [city, setCity] = useState('');
+  const [area, setArea] = useState('');
+
+  // Ensure selects show placeholder color when empty to match input placeholders
+  const getSelectColorClass = (currentValue: string) =>
+    currentValue ? 'text-[#3d3d3d]' : 'text-[#B8B1B1]';
+
+  const provinceList = Object.keys(locations);
+  const cityList = province ? Object.keys(locations[province]) : [];
+  const areaList = province && city ? locations[province][city] : [];
+
+  
   return (
     <div className="min-h-screen bg-white">
       <Header variant="simple" />
@@ -47,19 +64,69 @@ const Checkout: React.FC = () => {
             </div>
             <div className="col-span-1">
               <div className="h-[67px] rounded-[15px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-6 mb-6 justify-between">
-                <input className="w-full placeholder-[#B8B1B1] text-[20px] outline-none" placeholder="Select City" />
+                <select
+                  className={`w-full text-[20px] outline-none appearance-none bg-transparent ${getSelectColorClass(province)}`}
+                  value={province}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setProvince(value);
+                    setCity('');
+                    setArea('');
+                  }}
+                >
+                  <option value="" disabled>
+                    Select Province
+                  </option>
+                  {provinceList.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 9l6 6 6-6" stroke="#B8B1B1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
               <div className="h-[67px] rounded-[15px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-6 mb-6 justify-between">
-                <input className="w-full placeholder-[#B8B1B1] text-[20px] outline-none" placeholder="Select Province" />
+                <select
+                  className={`w-full text-[20px] outline-none appearance-none bg-transparent ${getSelectColorClass(city)}`}
+                  value={city}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setCity(value);
+                    setArea('');
+                  }}
+                  disabled={!province}
+                >
+                  <option value="" disabled>
+                    Select City
+                  </option>
+                  {cityList.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 9l6 6 6-6" stroke="#B8B1B1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
               <div className="h-[67px] rounded-[15px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-6 mb-6 justify-between">
-                <input className="w-full placeholder-[#B8B1B1] text-[20px] outline-none" placeholder="Select Area" />
+                <select
+                  className={`w-full text-[20px] outline-none appearance-none bg-transparent ${getSelectColorClass(area)}`}
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  disabled={!province || !city}
+                >
+                  <option value="" disabled>
+                    Select Area
+                  </option>
+                  {areaList.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 9l6 6 6-6" stroke="#B8B1B1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -97,17 +164,67 @@ const Checkout: React.FC = () => {
             <div className="h-[38px] rounded-[10px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-[18px]">
               <input className="w-full placeholder-[#B8B1B1] text-[12px] outline-none" placeholder="Building / House no / Floor / Street" />
             </div>
-            <div className="h-[38px] rounded-[10px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-[18px] justify-between">
-              <input className="w-full placeholder-[#B8B1B1] text-[12px] outline-none" placeholder="Select City" />
-              <span className="text-[#B8B1B1] text-[20px]">&gt;</span>
+            <div className="h-[38px] rounded-[10px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-[18px] justify-between relative">
+              <select
+                className={`w-full text-[12px] outline-none appearance-none bg-transparent ${getSelectColorClass(province)}`}
+                value={province}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setProvince(value);
+                  setCity('');
+                  setArea('');
+                }}
+              >
+                <option value="" disabled>
+                  Select Province
+                </option>
+                {provinceList.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+              <img src={arrowIcon} alt="Arrow" />
             </div>
-            <div className="h-[38px] rounded-[10px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-[18px] justify-between">
-              <input className="w-full placeholder-[#B8B1B1] text-[12px] outline-none" placeholder="Select Province" />
-              <span className="text-[#B8B1B1] text-[20px]">&gt;</span>
+            <div className="h-[38px] rounded-[10px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-[18px] justify-between relative">
+              <select
+                className={`w-full text-[12px] outline-none appearance-none bg-transparent ${getSelectColorClass(city)}`}
+                value={city}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setCity(value);
+                  setArea('');
+                }}
+                disabled={!province}
+              >
+                <option value="" disabled>
+                  Select City
+                </option>
+                {cityList.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <img src={arrowIcon} alt="Arrow" />
             </div>
-            <div className="h-[38px] rounded-[10px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-[18px] justify-between">
-              <input className="w-full placeholder-[#B8B1B1] text-[12px] outline-none" placeholder="Select Area" />
-              <span className="text-[#B8B1B1] text-[20px]">&gt;</span>
+            <div className="h-[38px] rounded-[10px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-[18px] justify-between relative">
+              <select
+                className={`w-full text-[12px] outline-none appearance-none bg-transparent ${getSelectColorClass(area)}`}
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                disabled={!province || !city}
+              >
+                <option value="" disabled>
+                  Select Area
+                </option>
+                {areaList.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+              <img src={arrowIcon} alt="Arrow" />
             </div>
             <div className="h-[38px] rounded-[10px] border border-[#B8B1B1] shadow-[1px_2px_4px_rgba(233,255,242,1)] flex items-center px-[18px]">
               <input className="w-full placeholder-[#B8B1B1] text-[12px] outline-none" placeholder="Write your full address" />

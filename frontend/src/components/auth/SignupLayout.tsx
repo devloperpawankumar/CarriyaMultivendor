@@ -32,16 +32,16 @@ const SignupLayout: React.FC<SignupLayoutProps> = ({
             <img
               src={logoImg}
               alt="Carriya Logo"
-              className="w-[160px] h-[50px] md:w-[204px] md:h-[65px] object-contain"
+              className="w-[99px] h-[41px] md:w-[204px] md:h-[65px] object-contain"
             />
           </div>
 
           {/* Already have account */}
-          <div className="flex items-center gap-2 text-[10px] md:text-[30px] font-light text-black">
-            <span>Already have an account?</span>
+          <div className="flex items-center gap-1 text-[12px] md:text-[30px]   font-light text-black/60">
+            <span >Already have an account?</span>
             <button
               onClick={() => window.location.href = '/login'}
-              className="underline hover:no-underline"
+              className="text-black"
             >
               Sign in
             </button>

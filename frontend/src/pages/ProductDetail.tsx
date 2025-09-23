@@ -227,7 +227,7 @@ const ProductDetail: React.FC = () => {
                   <button
                     key={s}
                     type="button"
-                    onClick={() => { setMobileSelectedSize(s); setMobileSizeOpen(false); }}
+                    onClick={() => { setMobileSelectedSize(s); /* Do not close dropdown */ }}
                     className={`w-full text-left py-2 text-[16px] ${((mobileSelectedSize ?? product.sizes[0]) === s) ? 'font-bold text-[#2ECC71]' : 'text-[#424551]'}`}
                   >
                     {s}
@@ -255,7 +255,7 @@ const ProductDetail: React.FC = () => {
                   <button
                     key={c}
                     type="button"
-                    onClick={() => { setMobileSelectedColor(c); setMobileColorOpen(false); }}
+                    onClick={() => { setMobileSelectedColor(c); /* Do not close dropdown */ }}
                     className={`w-full text-left py-2 text-[16px] ${((mobileSelectedColor ?? product.colors[0]) === c) ? 'font-bold text-[#2ECC71]' : 'text-[#424551]'}`}
                   >
                     {c}
