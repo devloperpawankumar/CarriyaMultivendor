@@ -20,28 +20,28 @@ const SignupLayout: React.FC<SignupLayoutProps> = ({
   return (
     <div className={`min-h-screen bg-white ${className}`}>
       {/* Only show the top green bar, not the full header */}
-      <div className="w-full h-[30px] md:h-[49px] bg-[#2ECC71] flex items-center justify-center text-white text-[12px] md:text-[20px] font-medium">
+      <div className="w-full h-[30px] md:h-[49px] bg-[#2ECC71] flex items-center justify-center text-white text-[11px] md:text-[20px] font-medium">
         Carriya - Buy , Sell And Carry
       </div>
 
-      <main className="max-w-7xl mx-auto px-[26px] md:px-[120px] py-6">
+      <main className="max-w-7xl mx-auto px-4 md:px-[120px] py-6">
         {/* Top row: Logo on left, Already have account on right */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between gap-2 mb-6 flex-wrap">
           {/* Carriya Logo */}
           <div>
             <img
               src={logoImg}
               alt="Carriya Logo"
-              className="w-[99px] h-[41px] md:w-[204px] md:h-[65px] object-contain"
+              className="w-[82px] h-[26px] md:w-[204px] md:h-[65px] object-contain"
             />
           </div>
 
           {/* Already have account */}
-          <div className="flex items-center gap-1 text-[12px] md:text-[30px]   font-light text-black/60">
-            <span >Already have an account?</span>
+          <div className="flex items-center gap-1 text-[11px] md:text-[30px] font-light text-black/60">
+            <span className="whitespace-nowrap">Already have an account?</span>
             <button
               onClick={() => window.location.href = '/login'}
-              className="text-black"
+              className="text-black underline md:no-underline"
             >
               Sign in
             </button>

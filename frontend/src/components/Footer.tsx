@@ -85,27 +85,27 @@ const Footer: React.FC = () => {
 
         {/* Mobile Layout - Based on Figma Design */}
         <div className="lg:hidden">
-          <div className="px-[20px] py-5">
+          <div className="px-[20px] py-5 max-[320px]:px-4">
             {/* Logo Section */}
-            <div className="mb-6">
-              <div className="bg-white rounded-[10px] w-[88px] h-[36.44px] mb-2 flex items-center justify-center">
+            <div className="mb-6 max-[320px]:mb-5">
+              <div className="bg-white rounded-[10px] w-[88px] h-[36.44px] mb-2 flex items-center justify-center max-[320px]:w-[84px] max-[320px]:h-[34px]">
                 <img
                   src={Footerlogo}
                   alt="Carriya Logo"
-                  className="w-[82.16px] h-[26.03px] object-contain"
+                  className="w-[82.16px] h-[26.03px] object-contain max-[320px]:w-[78px] max-[320px]:h-[24px]"
                 />
               </div>
-              <p className="text-white/80 text-[7px] leading-[1.364]">
+              <p className="text-white/80 text-[7px] leading-[1.364] max-[320px]:text-[6.5px]">
                 Carriya Buy , Sell And Carry
               </p>
             </div>
 
             {/* Content Grid - 3 columns as per Figma */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-3 gap-6 mb-8 max-[320px]:gap-4 max-[320px]:mb-6">
               {/* Company Column */}
               <div>
-                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3">Company</h3>
-                <ul className="space-y-2 text-[10px] leading-[1.364] text-white/80">
+                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3 max-[320px]:text-[12px]">Company</h3>
+                <ul className="space-y-2 text-[10px] leading-[1.364] text-white/80 max-[320px]:text-[9px]">
                   <li><a href="#" className="hover:underline">Blog</a></li>
                   <li><a href="#" className="hover:underline">About Us</a></li>
                   <li><a href="#" className="hover:underline">Contact Us</a></li>
@@ -114,8 +114,8 @@ const Footer: React.FC = () => {
 
               {/* Information Column */}
               <div>
-                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3">Information</h3>
-                <ul className="space-y-2 text-[10px] leading-[1.364] text-white/80">
+                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3 max-[320px]:text-[12px]">Information</h3>
+                <ul className="space-y-2 text-[10px] leading-[1.364] text-white/80 max-[320px]:text-[9px]">
                   <li><a href="#" className="hover:underline">Help Center</a></li>
                   <li><a href="#" className="hover:underline">Return & Refund</a></li>
                   <li><a href="#" className="hover:underline">Become a seller</a></li>
@@ -124,14 +124,14 @@ const Footer: React.FC = () => {
 
               {/* Contact Us Column */}
               <div>
-                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3">Contact Us</h3>
-                <div className="space-y-2 text-[10px] leading-[1.364] text-white/80">
+                <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3 max-[320px]:text-[12px]">Contact Us</h3>
+                <div className="space-y-2 text-[10px] leading-[1.364] text-white/80 max-[320px]:text-[9px]">
                   <div className="flex items-center gap-2">
-                    <img src={phoneIcon} alt="Phone" className="w-[13px] h-[13px]" />
+                    <img src={phoneIcon} alt="Phone" className="w-[13px] h-[13px] max-[320px]:w-3 max-[320px]:h-3" />
                     <span>+92 3146-045</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <img src={mailIcon} alt="Email" className="w-[13px] h-[13px]" />
+                    <img src={mailIcon} alt="Email" className="w-[13px] h-[13px] max-[320px]:w-3 max-[320px]:h-3" />
                     <span>info@carryia.com</span>
                   </div>
                 </div>
@@ -139,18 +139,18 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Social Media Icons */}
-            <div className="flex gap-[13px]">
-              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center">
-                <img src={Instagram} alt="Instagram" className="w-[14.64px] h-[14.64px]" />
+            <div className="flex gap-[13px] max-[320px]:gap-2.5">
+              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center max-[320px]:w-[22px] max-[320px]:h-[22px] max-[320px]:p-[3px]">
+                <img src={Instagram} alt="Instagram" className="w-[14.64px] h-[14.64px] max-[320px]:w-[13px] max-[320px]:h-[13px]" />
               </a>
-              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center">
-                <img src={Twitter} alt="Twitter" className="w-[14.64px] h-[14.64px]" />
+              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center max-[320px]:w-[22px] max-[320px]:h-[22px] max-[320px]:p-[3px]">
+                <img src={Twitter} alt="Twitter" className="w-[14.64px] h-[14.64px] max-[320px]:w-[13px] max-[320px]:h-[13px]" />
               </a>
-              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center">
-                <img src={Facebook} alt="Facebook" className="w-[14.64px] h-[14.64px]" />
+              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center max-[320px]:w-[22px] max-[320px]:h-[22px] max-[320px]:p-[3px]">
+                <img src={Facebook} alt="Facebook" className="w-[14.64px] h-[14.64px] max-[320px]:w-[13px] max-[320px]:h-[13px]" />
               </a>
-              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center">
-                <img src={Youtube} alt="YouTube" className="w-[14.64px] h-[14.64px]" />
+              <a href="#" className="bg-white rounded-[8px] w-[24.59px] h-[24.59px] p-[3.51px] flex items-center justify-center max-[320px]:w-[22px] max-[320px]:h-[22px] max-[320px]:p-[3px]">
+                <img src={Youtube} alt="YouTube" className="w-[14.64px] h-[14.64px] max-[320px]:w-[13px] max-[320px]:h-[13px]" />
               </a>
             </div>
           </div>
@@ -194,9 +194,9 @@ const Footer: React.FC = () => {
 
         {/* Mobile Layout */}
         <div className="lg:hidden">
-          <div className="px-5 py-3">
-            <div className="text-xs text-white/70 text-center">
-              
+          <div className="py-3" style={{ paddingLeft: `calc(20px + env(safe-area-inset-left))`, paddingRight: `calc(20px + env(safe-area-inset-right))` }}>
+            <div className="text-xs text-white/70 text-center max-[320px]:text-[11px]">
+            
             </div>
           </div>
         </div>
