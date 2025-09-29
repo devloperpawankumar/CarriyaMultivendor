@@ -128,7 +128,7 @@ const Footer: React.FC = () => {
                 <div className="space-y-2 text-[10px] leading-[1.364] text-white/80 max-[320px]:text-[9px]">
                   <div className="flex items-center gap-2">
                     <img src={phoneIcon} alt="Phone" className="w-[13px] h-[13px] max-[320px]:w-3 max-[320px]:h-3" />
-                    <span>+92 3146-045</span>
+                    <span className="text-[9.1px] leading-[1.364] text-white/80 max-[320px]:text-[9px]">+92 3146-045-045</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <img src={mailIcon} alt="Email" className="w-[13px] h-[13px] max-[320px]:w-3 max-[320px]:h-3" />
