@@ -243,20 +243,50 @@ const LowStock: React.FC = () => {
     if (!container) return;
     const crect = container.getBoundingClientRect();
     const cells = [titleRef.current, priceRef.current, stockRef.current, statusRef.current];
-    const xs: number[] = [];
+    const rawXs: number[] = [];
     cells.forEach((el) => {
       if (!el) return;
       const r = el.getBoundingClientRect();
-      xs.push(Math.round(r.left - crect.left));
+      rawXs.push(r.left - crect.left);
     });
-    setDividerXs((prev) => (JSON.stringify(prev) === JSON.stringify(xs) ? prev : xs));
+    const withinBounds = rawXs
+      .filter((x) => x > 1 && x < crect.width - 1)
+      .sort((a, b) => a - b);
+    const deduped: number[] = [];
+    for (const x of withinBounds) {
+      if (deduped.length === 0 || Math.abs(x - deduped[deduped.length - 1]) > 2) {
+        deduped.push(Math.round(x));
+      }
+    }
+    setDividerXs((prev) => (JSON.stringify(prev) === JSON.stringify(deduped) ? prev : deduped));
   }, [isMobile]);
 
   React.useLayoutEffect(() => {
-    recalcDividers();
-    const onResize = () => recalcDividers();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const raf1 = requestAnimationFrame(() => {
+      recalcDividers();
+      const raf2 = requestAnimationFrame(recalcDividers);
+      // @ts-ignore
+      if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+        // @ts-ignore
+        document.fonts.ready.then(() => recalcDividers());
+      }
+      const container = containerRef.current;
+      let ro: ResizeObserver | null = null;
+      if (container && 'ResizeObserver' in window) {
+        ro = new ResizeObserver(() => recalcDividers());
+        ro.observe(container);
+      }
+      const onResize = () => recalcDividers();
+      window.addEventListener('resize', onResize);
+      window.addEventListener('load', onResize);
+      return () => {
+        cancelAnimationFrame(raf2);
+        window.removeEventListener('resize', onResize);
+        window.removeEventListener('load', onResize);
+        if (ro) ro.disconnect();
+      };
+    });
+    return () => cancelAnimationFrame(raf1);
   }, [recalcDividers]);
 
   // Backend-friendly pagination state
@@ -471,7 +501,7 @@ const LowStock: React.FC = () => {
                 {/* Continuous vertical dividers overlay only for header+rows */}
                 <div className="pointer-events-none absolute inset-0">
                   {dividerXs.map((x, i) => (
-                    <div key={i} className="absolute top-0 bottom-0" style={{ left: x, width: 1, background: '#C1C1C1' }} />
+                    <div key={i} className="absolute top-0 bottom-0" style={{ left: x + 0.5, width: 1, background: '#C1C1C1' }} />
                   ))}
                 </div>
               </div>

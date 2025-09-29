@@ -22,7 +22,7 @@ const SellerDashboard = lazy(() => import('./pages/sellerDashboard'));
 const ManageProducts = lazy(() => import('./pages/sellerDashboard/manageProducts/ManageProducts'));
 const ManageOrders = lazy(() => import('./pages/sellerDashboard/manageOrders'));
 const ManagePayments = lazy(() => import('./pages/sellerDashboard/managePayments/ManagePayments'));
-const ManageReports = lazy(() => import('./pages/sellerDashboard/ManageReports'));
+const ManageReports = lazy(() => import('./pages/sellerDashboard/manageReports'));
 const SellerSettings = lazy(() => import('./pages/sellerDashboard/Settings'));
 const AddProduct = lazy(() => import('./pages/sellerDashboard/manageProducts/AddProduct'));
 const MyProducts = lazy(() => import('./pages/sellerDashboard/manageProducts/MyProducts'));

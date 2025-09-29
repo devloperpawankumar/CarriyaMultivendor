@@ -34,7 +34,7 @@ const SellerDashboard: React.FC = () => {
         navigate('/seller/dashboard');
         break;
       case 'reports':
-        navigate('/seller/dashboard');
+        navigate('/seller/manage-reports');
         break;
       case 'settings':
         navigate('/seller/dashboard');
