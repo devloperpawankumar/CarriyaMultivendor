@@ -153,7 +153,7 @@ const MyProducts: React.FC = () => {
 
   return (
     <SellerScaffold menuIcons={sellerMenuIcons} menuRoutes={sellerMenuRoutes}>
-      <div className="w-full px-3 md:px-6 lg:px-8">
+      <div className="w-full px-3 md:px-6 lg:px-8 overflow-x-hidden">
         {/* Header Section - Mobile aligns button right of title */}
         <div className="flex flex-col mb-4 md:mb-8 gap-3">
           <div className="flex flex-row items-center justify-between md:flex-row md:items-start gap-3">
