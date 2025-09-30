@@ -48,8 +48,8 @@ const BankVerification: React.FC = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Navigate to the next step
-      navigate('/seller-dashboard');
+      // Navigate to the seller dashboard
+      navigate('/seller/dashboard');
     } catch (error) {
       console.error('Error submitting bank verification:', error);
     } finally {

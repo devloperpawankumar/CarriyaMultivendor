@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import './App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
+import ScrollToTop from './components/common/ScrollToTop';
 
 const Home = lazy(() => import('./pages/Home'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
@@ -23,18 +24,26 @@ const ManageProducts = lazy(() => import('./pages/sellerDashboard/manageProducts
 const ManageOrders = lazy(() => import('./pages/sellerDashboard/manageOrders'));
 const ManagePayments = lazy(() => import('./pages/sellerDashboard/managePayments/ManagePayments'));
 const ManageReports = lazy(() => import('./pages/sellerDashboard/manageReports'));
-const SellerSettings = lazy(() => import('./pages/sellerDashboard/Settings'));
+const SellerSettings = lazy(() => import('./pages/sellerDashboard/settings/Settings'));
 const AddProduct = lazy(() => import('./pages/sellerDashboard/manageProducts/AddProduct'));
 const MyProducts = lazy(() => import('./pages/sellerDashboard/manageProducts/MyProducts'));
 const EditDraft = lazy(() => import('./pages/sellerDashboard/manageProducts/EditDraft'));
 const LowStock = lazy(() => import('./pages/sellerDashboard/manageProducts/LowStock'));
 const RestockProduct = lazy(() => import('./pages/sellerDashboard/manageProducts/RestockProduct'));
+const BlogPage = lazy(() => import('./pages/blogpage/BlogPage'));
+const AboutUs = lazy(() => import('./pages/aboutus/AboutUs'));
+const PrivacyPolicy = lazy(() => import('./pages/privacypolicy/PrivacyPolicy'));
+const ReturnRefundPolicy = lazy(() => import('./pages/returnRefundPolicy/ReturnRefundPolicy'));
+const ReturnRefundForm = lazy(() => import('./pages/returnRefundPolicy/ReturnRefundForm'));
+const ContactUs = lazy(() => import('./pages/contactUs/ContactUs'));
+const HelpSupport = lazy(() => import('./pages/helpSupport/HelpSupport'));
 
 function App() {
   return (
     <CartProvider>
       <div className="App">
         <Suspense fallback={<div className="p-8">Loading...</div>}>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/product/:productId" element={<ProductDetail />} />
@@ -62,6 +71,13 @@ function App() {
             <Route path="/seller/manage-payments" element={<ManagePayments />} />
             <Route path="/seller/manage-reports" element={<ManageReports />} />
             <Route path="/seller/settings" element={<SellerSettings />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/return-refund-policy" element={<ReturnRefundPolicy />} />
+            <Route path="/return-refund-form" element={<ReturnRefundForm />} />
+            <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/help-support" element={<HelpSupport />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
