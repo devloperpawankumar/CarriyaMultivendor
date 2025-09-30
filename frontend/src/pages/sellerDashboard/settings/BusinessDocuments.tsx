@@ -19,7 +19,7 @@ const BusinessDocuments: React.FC = () => {
           className={inputClass}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Muhammad Wasif Bhatti"
+          placeholder="Enter Name"
         />
       </div>
 
@@ -31,7 +31,7 @@ const BusinessDocuments: React.FC = () => {
           className={inputClass}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="mygmail1234@gmail.com"
+          placeholder="Enter Email"
         />
       </div>
 
