@@ -4,6 +4,7 @@ import saleIcon from '../../assets/images/Icon (Stroke).png';
 import favIcon from '../../assets/images/outline.png';
 import cartIcon from '../../assets/images/Cart.png';
 import Arrows from '../../assets/images/Vector.png';
+import { useNavigate } from 'react-router-dom';
 
 const InfoPanel: React.FC<{
   price: number;
@@ -22,7 +23,7 @@ const InfoPanel: React.FC<{
   const [sizeOpen, setSizeOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
-
+  const navigate = useNavigate();
   return (
     <div>
       <div className="flex items-end justify-between mb-6">
@@ -108,7 +109,10 @@ const InfoPanel: React.FC<{
           </button>
         </div>
 
-        <button className="w-full h-11 bg-[#2ECC71] text-white rounded flex items-center justify-center">
+        <button
+          className="w-full h-11 bg-[#2ECC71] text-white rounded flex items-center justify-center"
+          onClick={() => navigate('/sellerstore')}
+        >
           <span className="text-[14px] font-bold tracking-[0.5px]">See Seller Store</span>
         </button>
       </div>

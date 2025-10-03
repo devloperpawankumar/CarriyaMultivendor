@@ -359,7 +359,7 @@ const ProductDetail: React.FC = () => {
 <div className="flex justify-end">
   <button
     className="px-4 w-1/2 h-11 bg-[#2ECC71] text-white rounded-[10px] font-medium mt-1"
-    onClick={() => navigate('/')}
+    onClick={() => navigate('/sellerstore')}
   >
     Go to Seller store
   </button>

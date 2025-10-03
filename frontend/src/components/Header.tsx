@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logoImg from "../assets/images/Carriya logo 1.png";
 import searchIcon from "../assets/images/searchicon.png";
 import favIcon from "../assets/images/Favourite Products icon.png";
@@ -9,6 +10,7 @@ import menuIcon from "../assets/images/MENU.png";
 import CategoryMenu from "./CategoryMenu";
 import { useCart } from "../contexts/CartContext";
 import { useFavorites } from "../contexts/FavoritesContext";
+
 
 export type HeaderProps = {
   variant?: 'simple' | 'full';
@@ -135,10 +137,10 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
               {/* Navigation Links */}
               <div className="flex items-center space-x-8">
-                <a href="#" className="text-white font-bold text-sm hover:text-gray-200">Home</a>
-                <a href="#" className="text-white font-bold text-sm hover:text-gray-200">My Orders</a>
-                <a href="#" className="text-white font-bold text-sm hover:text-gray-200">About Us</a>
-                <a href="#" className="text-white font-bold text-sm hover:text-gray-200">Contact Us</a>
+                <Link to="/" className="text-white font-bold text-sm hover:text-gray-200">Home</Link>
+                <Link to="/" className="text-white font-bold text-sm hover:text-gray-200">My Orders</Link>
+                <Link to="/about" className="text-white font-bold text-sm hover:text-gray-200">About Us</Link>
+                <Link to="/contact-us" className="text-white font-bold text-sm hover:text-gray-200">Contact Us</Link>
               </div>
 
               {/* Action Buttons */}
@@ -199,58 +201,102 @@ function Header({ variant = 'simple' }: HeaderProps) {
               </button>
             </div>
 
-            {/* Menu Links + Footer Buttons together */}
-            <nav className="px-6 py-6 space-y-6 text-black flex flex-col">
-              <a
-                href="#"
-                className="block font-semibold text-green-600 border-b border-green-600 w-fit"
-              >
-                Home
-              </a>
-              <a href="#" className="block font-medium">
-                Categories
-              </a>
-              <a href="#" className="block font-medium">
-                Blogs
-              </a>
-              <a href="#" className="block font-medium">
-                About Us
-              </a>
-              <a href="#" className="block font-medium">
-                Contact Us
-              </a>
-              <a href="#" className="block font-medium">
-                Sell
-              </a>
+          <nav className="px-6 py-6 space-y-6 text-black flex flex-col">
+      {/* Menu Links */}
+      <NavLink
+        to="/"
+        className={({ isActive }) =>
+          isActive
+            ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
+            : "block font-medium"
+        }
+      >
+        Home
+      </NavLink>
 
-              {/* Footer Buttons immediately after links */}
-              <div className="pt-4 border-t">
-                <a
-                  href="/signup"
-                  className="text-green-600 font-medium"
-                  onClick={e => {
-                    e.preventDefault();
-                    window.location.href = '/signup';
-                  }}
-                >
-                  Sign in
-                </a>
-                <span className="mx-1">or</span>
-                <a
-                  href="/signup"
-                  className="text-green-600 font-medium"
-                  onClick={e => {
-                    e.preventDefault();
-                    window.location.href = '/signup';
-                  }}
-                >
-                  Register
-                </a>
-              </div>
-            </nav>
+      <NavLink
+        to="/categories"
+        className={({ isActive }) =>
+          isActive
+            ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
+            : "block font-medium"
+        }
+      >
+        Categories
+      </NavLink>
+
+      <NavLink
+        to="/blog"
+        className={({ isActive }) =>
+          isActive
+            ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
+            : "block font-medium"
+        }
+      >
+        Blogs
+      </NavLink>
+
+      <NavLink
+        to="/about"
+        className={({ isActive }) =>
+          isActive
+            ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
+            : "block font-medium"
+        }
+      >
+        About Us
+      </NavLink>
+
+      <NavLink
+        to="/contact-us"
+        className={({ isActive }) =>
+          isActive
+            ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
+            : "block font-medium"
+        }
+      >
+        Contact Us
+      </NavLink>
+
+      <NavLink
+        to="/sell"
+        className={({ isActive }) =>
+          isActive
+            ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
+            : "block font-medium"
+        }
+      >
+        Sell
+      </NavLink>
+
+      {/* Footer Buttons */}
+      <div className="pt-4 border-t flex items-center gap-2">
+        <NavLink
+          to="/signup"
+          className={({ isActive }) =>
+            isActive
+              ? "text-green-600 font-semibold border-b border-green-600"
+              : "text-green-600 font-medium"
+          }
+        >
+          Sign in
+        </NavLink>
+        <span>or</span>
+        <NavLink
+          to="/signup"
+          className={({ isActive }) =>
+            isActive
+              ? "text-green-600 font-semibold border-b border-green-600"
+              : "text-green-600 font-medium"
+          }
+        >
+          Register
+        </NavLink>
+      </div>
+    </nav>
           </div>
         )}
-
+  
       </div>
     </header>
   );

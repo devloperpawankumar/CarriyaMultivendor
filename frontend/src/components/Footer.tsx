@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Footerlogo from "../assets/images/Footerlogo.png";
 import Facebook from "../assets/images/Facebooksocial.png";
 import Twitter from "../assets/images/ThreadSocial.png";
@@ -41,9 +42,9 @@ const Footer: React.FC = () => {
               <div>
                 <h3 className="text-lg font-semibold">Company</h3>
                 <ul className="mt-6 space-y-3 text-sm text-white/90">
-                  <li><a href="#" className="hover:underline">Blog</a></li>
-                  <li><a href="#" className="hover:underline">About Us</a></li>
-                  <li><a href="#" className="hover:underline">Contact Us</a></li>
+                  <li><Link to="/blog" className="hover:underline">Blog</Link></li>
+                  <li><Link to="/about" className="hover:underline">About Us</Link></li>
+                  <li><Link to="/contact-us" className="hover:underline">Contact Us</Link></li>
                 </ul>
               </div>
 
@@ -51,9 +52,9 @@ const Footer: React.FC = () => {
               <div>
                 <h3 className="text-lg font-semibold">Information</h3>
                 <ul className="mt-6 space-y-3 text-sm text-white/90">
-                  <li><a href="#" className="hover:underline">Help Center</a></li>
-                  <li><a href="#" className="hover:underline">Return & Refund</a></li>
-                  <li><a href="#" className="hover:underline">Become a seller</a></li>
+                  <li><Link to="/help-support" className="hover:underline">Help Center</Link></li>
+                  <li><Link to="/return-refund-policy" className="hover:underline">Return & Refund</Link></li>
+                  <li><Link to="/seller-signup" className="hover:underline">Become a seller</Link></li>
                 </ul>
               </div>
 
@@ -106,9 +107,9 @@ const Footer: React.FC = () => {
               <div>
                 <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3 max-[320px]:text-[12px]">Company</h3>
                 <ul className="space-y-2 text-[10px] leading-[1.364] text-white/80 max-[320px]:text-[9px]">
-                  <li><a href="#" className="hover:underline">Blog</a></li>
-                  <li><a href="#" className="hover:underline">About Us</a></li>
-                  <li><a href="#" className="hover:underline">Contact Us</a></li>
+                  <li><Link to="/blog" className="hover:underline">Blog</Link></li>
+                  <li><Link to="/about" className="hover:underline">About Us</Link></li>
+                  <li><Link to="/contact-us" className="hover:underline">Contact Us</Link></li>
                 </ul>
               </div>
 
@@ -116,9 +117,9 @@ const Footer: React.FC = () => {
               <div>
                 <h3 className="text-white font-bold text-[13px] leading-[1.364] mb-3 max-[320px]:text-[12px]">Information</h3>
                 <ul className="space-y-2 text-[10px] leading-[1.364] text-white/80 max-[320px]:text-[9px]">
-                  <li><a href="#" className="hover:underline">Help Center</a></li>
-                  <li><a href="#" className="hover:underline">Return & Refund</a></li>
-                  <li><a href="#" className="hover:underline">Become a seller</a></li>
+                <li><Link to="/help-support" className="hover:underline">Help Center</Link></li>
+                  <li><Link to="/return-refund-policy" className="hover:underline">Return & Refund</Link></li>
+                  <li><Link to="/seller-signup" className="hover:underline">Become a seller</Link></li>
                 </ul>
               </div>
 

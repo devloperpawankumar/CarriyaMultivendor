@@ -37,6 +37,11 @@ const ReturnRefundPolicy = lazy(() => import('./pages/returnRefundPolicy/ReturnR
 const ReturnRefundForm = lazy(() => import('./pages/returnRefundPolicy/ReturnRefundForm'));
 const ContactUs = lazy(() => import('./pages/contactUs/ContactUs'));
 const HelpSupport = lazy(() => import('./pages/helpSupport/HelpSupport'));
+const SellerStore = lazy(() => import('./pages/SellerStore'));
+const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
+const AdminSeeTransaction = lazy(() => import('./pages/adminDashboard/SeeTransaction'));
+const AdminSellerDetails = lazy(() => import('./pages/adminDashboard/SellerDetails'));
+const AdminEditContent = lazy(() => import('./pages/adminDashboard/EditContent'));
 
 function App() {
   return (
@@ -71,6 +76,10 @@ function App() {
             <Route path="/seller/manage-payments" element={<ManagePayments />} />
             <Route path="/seller/manage-reports" element={<ManageReports />} />
             <Route path="/seller/settings" element={<SellerSettings />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/edit-content" element={<AdminEditContent />} />
+            <Route path="/admin/transactions" element={<AdminSeeTransaction />} />
+            <Route path="/admin/sellers/:id" element={<AdminSellerDetails />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -78,6 +87,7 @@ function App() {
             <Route path="/return-refund-form" element={<ReturnRefundForm />} />
             <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/help-support" element={<HelpSupport />} />
+            <Route path="/sellerstore" element={<SellerStore />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
