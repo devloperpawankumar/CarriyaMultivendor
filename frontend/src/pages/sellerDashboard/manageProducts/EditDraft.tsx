@@ -221,7 +221,7 @@ const EditDraft: React.FC = () => {
   const EditButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
     const base = 'inline-flex items-center justify-center rounded-[10px] h-10 w-[119px] text-[18px] font-semibold bg-[#CC9501] text-white';
     return (
-      <button onClick={onClick} className={base}>
+      <button onClick={()=>navigate(`/seller/manage-products/add-product`)} className={base}>
         Edit
       </button>
     );
@@ -230,7 +230,7 @@ const EditDraft: React.FC = () => {
   const MobileEditButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
     const base = 'inline-flex items-center justify-center rounded-[5px] h-[23px] w-[75px] text-[10px] font-semibold bg-[#CC9501] text-white';
     return (
-      <button onClick={onClick} className={base}>
+      <button onClick={()=>navigate(`/seller/manage-products/add-product`)} className={base}>
         Edit
       </button>
     );
