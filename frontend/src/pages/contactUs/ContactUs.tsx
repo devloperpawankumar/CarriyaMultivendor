@@ -8,15 +8,16 @@ import Facebook from '../../assets/images/Contactus/social-facebook.png';
 import Linkedin from '../../assets/images/Contactus/social-linkedin.png';
 import callicon from '../../assets/images/Contactus/CallContactus.png';
 import emailicon from '../../assets/images/Contactus/Email.png';
+import Header from '../../components/Header';
 
 const inputBase = 'w-full rounded-[10px] border border-[#E2E0E0] h-[60px] md:h-[80px] px-4 md:px-6 text-[16px] md:text-[20px] placeholder-[#949494] outline-none';
 
 const ContactUs: React.FC = () => {
   return (
     <div className="w-full">
-      <div className="w-full h-10 bg-carriya-green flex items-center justify-center text-white text-sm md:text-base font-medium">
-        Carriya - Buy , Sell And Carry
-      </div>
+      <Header  variant='full'/>
+      
+     
 
       {/* Banner with overlay and title */}
       <div className="w-full relative">

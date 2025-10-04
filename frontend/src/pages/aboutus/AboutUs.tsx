@@ -3,6 +3,7 @@ import Footer from '../../components/Footer';
 import Aboutushero from '../../assets/images/Blog/Banner 1.png';
 import Aboutushero2 from '../../assets/images/Blog/OurMission.png';
 import Aboutushero3 from '../../assets/images/Blog/CEO banner.png';
+import Header from '../../components/Header';
 
 function getOptionalImage(relativePath: string): string {
   try {
@@ -15,10 +16,11 @@ function getOptionalImage(relativePath: string): string {
 
 const AboutUs: React.FC = () => {
   return (
+    
     <div className="w-full">
-      <div className="w-full h-10 bg-carriya-green flex items-center justify-center text-white text-sm md:text-base font-medium">
-        Carriya - Buy , Sell And Carry
-      </div>
+      <Header variant='full' />
+      
+     
 
       <div className="mx-auto max-w-[1216px] px-4 sm:px-6 lg:px-0">
         {/* Title */}
