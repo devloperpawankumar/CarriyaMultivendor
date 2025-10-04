@@ -14,21 +14,21 @@ const SellerStore: React.FC = () => {
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
   const logoInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleBannerSelect: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setBannerPreview(url);
-    }
-  };
+  // const handleBannerSelect: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const url = URL.createObjectURL(file);
+  //     setBannerPreview(url);
+  //   }
+  // };
 
-  const handleLogoSelect: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setLogoPreview(url);
-    }
-  };
+  // const handleLogoSelect: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const url = URL.createObjectURL(file);
+  //     setLogoPreview(url);
+  //   }
+  // };
   const products = [
     { id: 1, name: 'Write The Name Of Product Here', price: 500, originalPrice: 1250, discount: 60, rating: 5, reviews: 25, image: product1 },
     { id: 2, name: 'Write The Name Of Product Here', price: 500, originalPrice: 1250, discount: 60, rating: 5, reviews: 25, image: product2 },
@@ -49,7 +49,7 @@ const SellerStore: React.FC = () => {
       <Header variant="full" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-        {/* Top bar: Browse categories and brand mark (as seen in Figma header area) could be part of Header */}
+        {/* Top bar: Browse categories and brand mark ( header area) could be part of Header */}
 
         {/* Upload banner area */}
         <div
@@ -65,16 +65,16 @@ const SellerStore: React.FC = () => {
               <div className="mx-auto  w-[25px] h-[35px] sm:w-[74.58px] sm:h-[74.57px] mb-1 sm:mb-2">
                 <img src={galleryicon} alt="gallery-add" className="w-full h-full object-contain" />
               </div>
-              <p className="text-[10px]  sm:text-[25px] leading-[1.366] text-[#4C535F] font-medium">Upload your banner</p>
+              <p className="text-[10px]  sm:text-[25px] leading-[1.366] text-[#4C535F] font-medium">No banner added</p>
             </div>
           )}
-          <input
+          {/* <input
             ref={bannerInputRef}
             type="file"
             accept="image/*"
             className="hidden"
             onChange={handleBannerSelect}
-          />
+          /> */}
         </div>
 
         {/* Logo + Description row */}
@@ -93,16 +93,16 @@ const SellerStore: React.FC = () => {
                 <div className="mx-auto w-[36px] h-[36px] sm:w-[64.72px] sm:h-[64.72px] mb-1 sm:mb-2">
                   <img src={galleryicon} alt="gallery-add" className="w-full h-full object-contain" />
                 </div>
-                <p className="text-[12px] sm:text-[15px] leading-[1.366] text-[#4C535F] font-medium mt-1 md:mt-2 sm:mt-5">Add logo</p>
+                <p className="text-[8px] sm:text-[15px] leading-[1.366] text-[#4C535F] font-medium mt-1 md:mt-2 sm:mt-5">No logo added</p>
               </div>
             )}
-            <input
+            {/* <input
               ref={logoInputRef}
               type="file"
               accept="image/*"
               className="hidden"
               onChange={handleLogoSelect}
-            />
+            /> */}
           </div>
 
           {/* Seller description */}

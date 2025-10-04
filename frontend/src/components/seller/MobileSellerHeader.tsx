@@ -49,17 +49,17 @@ const MobileSellerHeader: React.FC = () => {
             src={require("../../assets/images/Seller/hamberger.png")}
             alt="menu"
             className="w-4 h-4 cursor-pointer"
-            // Mobile responsive work: force hamburger to black on mobile, per Figma
+            // Mobile responsive work: force hamburger to black on mobile, 
             style={{ filter: 'brightness(0) saturate(100%)' }}
             onClick={() => setMenuOpen(true)}
           />
         </div>
       </div>
 
-      {/* Mobile responsive work: Fullscreen Menu matching Figma spacing/colors */}
+      {/* Mobile responsive work: Fullscreen Menus */}
       {menuOpen && (
         <div className="fixed inset-0 z-50 bg-white">
-          {/* Mobile responsive work: upper green row per Figma */}
+          {/* Mobile responsive work:  */}
           <div className="w-full" style={{ height: 30, backgroundColor: '#2ECC71' }}>
             <div className="h-full flex items-center justify-center">
               <span className="text-white" style={{ fontSize: 12, fontWeight: 500 }}>
@@ -83,7 +83,7 @@ const MobileSellerHeader: React.FC = () => {
             </button>
           </div>
 
-          {/* Separator lines (grey and green) per Figma */}
+          {/* Separator lines (grey and green)  */}
           {/* <div className="w-full" style={{ height: 1, backgroundColor: '#949494' }} />
           <div className="w-[150px] ml-[26px]" style={{ height: 1, backgroundColor: '#2ECC71' }} /> */}
 

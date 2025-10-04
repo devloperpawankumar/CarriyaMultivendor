@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import signupImage from '../assets/images/auth/Rectangle 114.png';
 import logoImg from '../assets/images/Carriya logo 1.png';
@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 const EmailVerification: React.FC = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState<'buyer' | 'seller'>('buyer');
+  const [isLocked, setIsLocked] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '']);
 
   const handleOtpChange = (index: number, value: string) => {
@@ -39,6 +40,15 @@ const EmailVerification: React.FC = () => {
       // Navigate to next page or show success
     }
   };
+
+  // Lock buyer flow on mount so user cannot switch to seller during verification
+  useEffect(() => {
+    try {
+      localStorage.setItem('flowLock', 'buyer');
+      setIsLocked(true);
+      setUserType('buyer');
+    } catch {}
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -96,13 +106,14 @@ const EmailVerification: React.FC = () => {
 
               {/* User Type Toggle */}
               <div className="mb-6 md:mb-8">
-                <div className="relative w-full max-w-[302px] md:max-w-[469px] h-[41px] md:h-[64px] border border-[#4B4B4B] rounded-[45px] bg-white mx-auto">
+                <div className={`relative w-full max-w-[302px] md:max-w-[469px] h-[41px] md:h-[64px] border border-[#4B4B4B] rounded-[45px] bg-white mx-auto ${isLocked ? 'opacity-60 pointer-events-none' : ''}`} aria-disabled={isLocked}>
                   <div className={`absolute top-[4.5px] left-[4.5px] md:top-[7px] md:left-[9px] h-[32px] md:h-[49px] bg-[#2ECC71] rounded-[45px] transition-transform duration-300 w-[calc(50%-9px)] md:w-[221px] ${userType === 'buyer' ? 'translate-x-0' : 'translate-x-[calc(100%+9px)]'}`} />
                   <div className="relative z-10 grid grid-cols-2 h-full">
                     <button type="button" onClick={() => setUserType('buyer')} className={`flex items-center justify-center text-[20px] md:text-[30px] font-normal ${userType === 'buyer' ? 'text-white' : 'text-black'}`}>Buyer</button>
-                    <button type="button" onClick={() => setUserType('seller')} className={`flex items-center justify-center text-[20px] md:text-[30px] font-normal ${userType === 'seller' ? 'text-white' : 'text-black'}`}>Seller</button>
+                    <button type="button" onClick={() => { if (isLocked) return; setUserType('seller'); }} className={`flex items-center justify-center text-[20px] md:text-[30px] font-normal ${userType === 'seller' ? 'text-white' : 'text-black'}`}>Seller</button>
                   </div>
                 </div>
+                {/* helper text intentionally hidden per requirement */}
               </div>
 
               {/* Form */}

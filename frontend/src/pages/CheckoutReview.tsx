@@ -126,7 +126,7 @@ const CheckoutReview: React.FC = () => {
 			</div>
 		</div>
 
-		{/* Mobile layout (matches Figma) */}
+		{/* Mobile layout  */}
 		<div className="md:hidden space-y-4">
 			{/* Shipping and billing card */}
 			<section className="border border-[#949494] rounded-[10px] p-4" style={{ height: 130 }}>

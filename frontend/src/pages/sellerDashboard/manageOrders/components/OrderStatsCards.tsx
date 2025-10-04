@@ -11,7 +11,7 @@ const OrderStatsCards: React.FC<OrderStatsCardsProps> = ({ stats }) => {
       title: "New Orders",
       count: stats.newOrders,
       gradient: "from-cyan-100 to-cyan-600",
-      bottomColor: "#1391C6", // Blue color from Figma
+      bottomColor: "#1391C6", // Blue color
       iconBg: "",
       icon: <img src={cartIcon} alt="new orders" className="w-6 h-6" />,
     },
@@ -46,13 +46,13 @@ const OrderStatsCards: React.FC<OrderStatsCardsProps> = ({ stats }) => {
           key={i}
           className={`relative w-full h-[110px] md:h-[120px] md:w-[190px] rounded-[20px] bg-gradient-to-br ${c.gradient} border border-gray-300 shadow-md overflow-hidden `}
         >
-          {/* Colored bottom rectangle exactly like Figma */}
+          {/* Colored bottom */}
           <div 
             className="absolute bottom-0 left-0 w-full h-[14px] md:h-[18px]"
             style={{ backgroundColor: c.bottomColor }}
           ></div>
           
-          {/* Content positioned exactly like Figma */}
+          {/* Content  */}
           <div className="relative z-10 h-full  ">
             {/* Title positioned at top left */}
             <h3 className="text-[13px] md:text-[15px] font-semibold text-gray-600 absolute top-[14px] md:top-[17px] left-[18px] md:left-[29px]  leading-tight">

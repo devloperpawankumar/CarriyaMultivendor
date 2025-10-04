@@ -54,14 +54,16 @@ const InputCard: React.FC<{
 			value={value}
 			onChange={(e) => onChange(e.target.value)}
 			placeholder={placeholder}
-			className="w-full h-full px-4 md:px-7 py-3 md:py-5 text-black placeholder-[#B8B1B1] focus:outline-none font-medium text-[15px] md:text-[25px]"
+            className="w-full h-full px-4 md:px-7 py-3 md:py-5 text-black placeholder-[#B8B1B1] focus:outline-none font-medium text-[15px] md:text-[25px]"
 			style={{ fontFamily: 'Roboto', lineHeight: '1.171875em', borderRadius: 10 }}
+            readOnly
+            // disabled
 		/>
 	</div>
 );
 
 const UploadCard: React.FC<{ label: string; onChange?: (file: File) => void }> = ({ label, onChange }) => (
-	<div className="relative cursor-pointer" style={{ width: 273.02, height: 128 }}>
+    <div className="relative" style={{ width: 273.02, height: 128 }}>
 		{/* Outer rectangle: 273.02x128, 1.5px border #B8B1B1, radius 20 */ }
 		<div className="absolute  bg-white inset-0 rounded-[20px]" style={{ borderColor: '#B8B1B1', borderWidth: 1.5, borderStyle: 'solid' }} />
 		{/* Inner rectangle: positioned at x:59, y:16 with size 154x80, 1px border #2ECC71, radius 25 */}
@@ -82,7 +84,9 @@ const UploadCard: React.FC<{ label: string; onChange?: (file: File) => void }> =
 					onChange && onChange(e.target.files[0]);
 				}
 			}}
-			className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            className="absolute inset-0 w-full h-full opacity-0"
+            disabled
+            aria-disabled="true"
 		/>
 	</div>
 );
@@ -112,19 +116,19 @@ const SellerDetails: React.FC = () => {
 		fetchNewSellers(ac.signal).then((list) => {
 			const base = list.find((s) => s.id === id);
 			if (base) {
-				// Temporary mocked extended fields to match the Figma until API provides them
+		
 				setSeller({
 					...base,
-					// phone: '',
-					// email: 'Hi',
-					// company: 'ABC Limited',
-					// pickupAddress: 'His pick up address',
-					// returnAddress: 'His Return address',
-					// idCardNumber: '35303-******-*',
-					// iban: 'PK838239020388383',
-					// accountNumber: 'PK838239020388383',
-					// bankName: 'HBL Bank',
-					// branchCode: '4455'
+					phone: '+92 321 1234569',
+					email: 'Hismail@gmail.com',
+					company: 'ABC Limited',
+					pickupAddress: 'His pick up address',
+					returnAddress: 'His Return address',
+					idCardNumber: '35303-******-*',
+					iban: 'PK838239020388383',
+					accountNumber: 'PK838239020388383',
+					bankName: 'HBL Bank',
+					branchCode: '4455'
 				});
 			}
 		});
@@ -163,7 +167,7 @@ const SellerDetails: React.FC = () => {
 				<div className="px-4 md:px-6 pb-10">
 					{/* Breadcrumbs & pill are already represented in sidebar header; omit in content to fit width */}
 
-					{/* Form area positioned to match figma coordinates */}
+					{/* Form area positioned coordinates */}
 					<div className="mt-8 md:px-0 px-3 md:mt-[40px] md:ml-[66px] md:mr-[40px] space-y-6 md:space-y-7">
 						{/* Row: First Name / Last Name */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-[48px]">

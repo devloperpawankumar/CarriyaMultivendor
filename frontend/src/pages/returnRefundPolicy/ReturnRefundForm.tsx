@@ -17,7 +17,7 @@ const ReturnRefundForm: React.FC = () => {
           <h1 className="text-[25px] md:text-[60px] font-bold leading-tight text-carriya-green">Return & Refund form</h1>
         </div>
 
-        {/* Card container centered like Figma card */}
+        {/* Card container centered  */}
         <div className="mt-8 flex justify-center">
           <div className="grid grid-cols-1 gap-5  md:space-y-0 space-y-5
 

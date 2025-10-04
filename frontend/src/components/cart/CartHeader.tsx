@@ -26,7 +26,7 @@ const CartHeader: React.FC<{
         </button>
       </section>
 
-      {/* Mobile Layout - matches Figma design */}
+      {/* Mobile Layout */}
       <section
         className="md:hidden border border-[#949494] rounded-[10px] mb-4 flex items-center justify-between"
         style={{ padding: '14px 15px', height: 44 }}

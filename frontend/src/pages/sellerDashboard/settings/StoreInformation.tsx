@@ -37,7 +37,7 @@ const StoreInformation: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Upload areas (stacked per Figma) */}
+      {/* Upload areas */}
       <div className="space-y-6">
         {/* Logo */}
         <div className="flex flex-col  justify-start">

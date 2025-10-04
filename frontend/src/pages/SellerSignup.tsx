@@ -50,7 +50,7 @@ const SellerSignup: React.FC = () => {
 
         {/* User Type Toggle */}
         <div className="mb-6 md:mb-8">
-          {/* Mobile: center toggle and cap width to 302px to match Figma */}
+          {/* Mobile: center toggle and cap width to 302px  */}
           <div className="mx-auto max-w-[302px] md:max-w-[469px] w-full py-4">
             <UserTypeToggle
               userType={userType}

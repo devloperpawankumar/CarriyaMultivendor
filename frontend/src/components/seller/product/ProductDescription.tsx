@@ -88,7 +88,7 @@ const ProductDescription: React.FC<Props> = ({ label = 'Product Description', va
 
   return (
     <div className={className}>
-      {/* Mobile responsive: smaller label and toolbar heights per Figma */}
+      {/* Mobile responsive: smaller label and toolbar   */}
       <label className="block text-[17px] md:text-[35px] font-semibold text-black mb-2">{label}</label>
       <div className="w-full rounded-[10px] shadow-[2px_3px_4px_rgba(46,204,113,0.25)] border border-[#B8B8B8] bg-white overflow-hidden">
         <div className="flex items-center justify-center gap-4 md:gap-6 h-[40px] md:h-[56px] px-4 md:px-6 border-b border-[#B8B8B8]">

@@ -16,7 +16,7 @@ const PrivacyPolicy: React.FC = () => {
         </div>
       </div>
 
-      {/* Body content, constrained to 1160px per Figma */}
+      {/* Body content, constrained  */}
       <div className="mx-auto max-w-[1160px] px-4 md:px-0">
         {/* Intro paragraph */}
         <section className="mt-12 md:px-0 px-2">

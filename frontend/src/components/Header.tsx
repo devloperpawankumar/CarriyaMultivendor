@@ -138,7 +138,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
               {/* Navigation Links */}
               <div className="flex items-center space-x-8">
                 <Link to="/" className="text-white font-bold text-sm hover:text-gray-200">Home</Link>
-                <Link to="/" className="text-white font-bold text-sm hover:text-gray-200">My Orders</Link>
+                <Link to="/my-orders" className="text-white font-bold text-sm hover:text-gray-200">My Orders</Link>
                 <Link to="/about" className="text-white font-bold text-sm hover:text-gray-200">About Us</Link>
                 <Link to="/contact-us" className="text-white font-bold text-sm hover:text-gray-200">Contact Us</Link>
               </div>
@@ -151,7 +151,8 @@ function Header({ variant = 'simple' }: HeaderProps) {
                 >
                   Sign-Up
                 </button>
-                <button className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100">Log-In</button>
+                <button className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100" 
+                onClick={()=>navigate("/login")}>Log-In</button>
                 <button 
                   onClick={() => navigate('/seller-signup')}
                   className="bg-carriya-dark text-white px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-800"
@@ -215,14 +216,14 @@ function Header({ variant = 'simple' }: HeaderProps) {
       </NavLink>
 
       <NavLink
-        to="/categories"
+        to="/my-orders"
         className={({ isActive }) =>
           isActive
             ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
             : "block font-medium"
         }
       >
-        Categories
+        My Orders
       </NavLink>
 
       <NavLink
@@ -272,7 +273,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
       {/* Footer Buttons */}
       <div className="pt-4 border-t flex items-center gap-2">
         <NavLink
-          to="/signup"
+          to="/login"
           className={({ isActive }) =>
             isActive
               ? "text-green-600 font-semibold border-b border-green-600"

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SignupLayout from '../components/auth/SignupLayout';
 import FormField from '../components/auth/FormField';
@@ -16,7 +16,17 @@ const EmailVerificationPage: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [showOtp, setShowOtp] = useState(false); // Mobile: reveal OTP UI after clicking Verify email
   const [isLoading, setIsLoading] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Enforce seller flow lock on Email Verification page
+  useEffect(() => {
+    try {
+      localStorage.setItem('flowLock', 'seller');
+      setIsLocked(true);
+      setUserType('seller');
+    } catch {}
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -49,7 +59,7 @@ const EmailVerificationPage: React.FC = () => {
       // Simulate API call to send verification email
       console.log('Sending verification email for:', formData);
       
-      // Here you would typically:
+      
       // 1. Send company name and email to backend
       // 2. Backend sends verification email
       // 3. Show success message
@@ -72,7 +82,7 @@ const EmailVerificationPage: React.FC = () => {
       const fullOtp = otp.join('');
       console.log('Verifying OTP:', fullOtp);
       
-      // Here you would typically:
+     
       // 1. Verify OTP with backend
       // 2. On successful verification, navigate to dashboard
       
@@ -124,10 +134,13 @@ const EmailVerificationPage: React.FC = () => {
         {/* User Type Toggle */}
         <div className="mb-6 md:mb-8 md:hidden">
           {/* Mobile: center toggle and cap width to 302px; desktop uses wider */}
-          <div className="mx-auto max-w-[302px] md:max-w-[469px] w-full py-4">
+          <div className={`mx-auto max-w-[302px] md:max-w-[469px] w-full py-4 ${isLocked ? 'opacity-60 pointer-events-none' : ''}`} aria-disabled={isLocked}>
             <UserTypeToggle
               userType={userType}
-              onUserTypeChange={(t) => setUserType(t)}
+              onUserTypeChange={(t) => {
+                if (isLocked && t === 'buyer') return;
+                setUserType(t);
+              }}
             />
           </div>
         </div>

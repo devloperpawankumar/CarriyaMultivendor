@@ -33,7 +33,7 @@ const OrderSummary: React.FC<{
         </div>
       </aside>
 
-      {/* Mobile Layout - matches Figma design */}
+      {/* Mobile Layout */}
       <aside className="md:hidden w-full">
         <div
           className="border border-[#949494] rounded-[10px] p-4"

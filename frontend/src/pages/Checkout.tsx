@@ -137,7 +137,7 @@ const Checkout: React.FC = () => {
             </div>
           </div>
 
-          {/* Controls below form like Figma: Home, Office, Next */}
+          {/* Controls below form : Home, Office, Next */}
           <div className="flex flex-wrap gap-4 items-center mt-8">
             <div className="flex items-center gap-2 border border-[#DADADA] rounded-[10px] shadow-sm px-4 py-3">
              <img src={homeIcon} alt="Home" />
@@ -151,7 +151,7 @@ const Checkout: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Layout - matches Figma design exactly */}
+        {/* Mobile Layout  */}
         <div className="md:hidden space-y-4">
           {/* Form fields in mobile layout */}
           <div className="space-y-4">

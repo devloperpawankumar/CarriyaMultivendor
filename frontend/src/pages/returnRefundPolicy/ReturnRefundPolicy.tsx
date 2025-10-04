@@ -9,7 +9,7 @@ const ReturnRefundPolicy: React.FC = () => {
         Carriya - Buy , Sell And Carry
       </div>
 
-      {/* Header/title block per Figma widths */}
+      {/* Header/title block  */}
       <div className="mx-auto max-w-[1160px]">
         <div className="px-4 md:px-0 mt-8 md:mt-10">
           <h1 className="text-[25px] md:text-[60px] font-bold leading-tight text-carriya-green text-center">Carryia Return & Refund Policy</h1>

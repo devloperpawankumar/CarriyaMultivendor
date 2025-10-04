@@ -101,8 +101,8 @@ const AddProduct: React.FC = () => {
       <h1 className="text-[24px] md:text-[40px] font-bold text-black  md:[-mb-2] -mb-4     text-left w-full md:py-0 py-2  max-w-[736px]">Add New Products</h1>
       <div className="text-[#949494] text-[14px] md:text-[20px] w-full text-left mb-4 md:mb-6  max-w-[736px]">Manage Products &gt; Add Products</div>
       
-      {/* Title (Figma order 1) */}
-      {/* Mobile responsive: label/input smaller per Figma; Desktop sizes preserved */}
+      {/* Title */}
+      {/* Mobile responsive: label/input smaller per ; Desktop sizes preserved */}
       <div className="w-full max-w-[736px] mb-4 md:mb-6">
         <label className="block text-[17px] md:text-[35px] font-semibold text-black mb-2">Product Title</label>
         <input
@@ -113,8 +113,8 @@ const AddProduct: React.FC = () => {
         />
       </div>
 
-      {/* Price and Stock row (Figma order 2) */}
-      {/* Mobile responsive: keep two inputs in one row at 168px each per Figma */}
+      {/* Price and Stock row */}
+      {/* Mobile responsive: keep two inputs in one row at 168px  */}
       <div className="w-full max-w-[736px] grid grid-cols-2 gap-3 md:gap-6 mb-2">
         <div>
           <label className="block text-[17px] md:text-[35px] font-semibold text-black mb-2">Price (PKR)</label>
@@ -136,7 +136,7 @@ const AddProduct: React.FC = () => {
         </div>
       </div>
 
-      {/* Discount + Unlimited Stock (same row per Figma 359:1173) */}
+      {/* Discount + Unlimited Stock  */}
       {/* Mobile responsive: two-column row with compact heights */}
       <div className="w-full max-w-[736px] grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-6 mb-6 md:mb-8">
         <div className="max-w-full md:max-w-[372px]">
@@ -170,8 +170,8 @@ const AddProduct: React.FC = () => {
       </div>
 
   
-      {/* Upload Images (Figma order 4) - same line with preview */}
-      {/* Mobile responsive: keep upload box and preview side-by-side per Figma */}
+      {/* Upload Images  - same line with preview */}
+      {/* Mobile responsive: keep upload box and preview */}
       <div className="w-full max-w-[736px]  flex flex-row justify-between gap-4 md:flex-row md:items-start md:gap-10 mb-8 md:mb-10">
         {/* Upload box */}
         <div>
@@ -199,8 +199,8 @@ const AddProduct: React.FC = () => {
         </div>
       </div>
 
-      {/* Upload Video (Figma order 5) - same line with preview */}
-      {/* Mobile responsive: keep upload box and preview side-by-side per Figma */}
+      {/* Upload Video  - same line with preview */}
+      {/* Mobile responsive: keep upload box and preview  */}
       <div className="w-full max-w-[736px]  flex flex-row justify-between gap-4 md:flex-row md:items-start md:gap-10 mb-8 md:mb-10">
         {/* Upload box */}
         <div>
@@ -235,7 +235,7 @@ const AddProduct: React.FC = () => {
 
     
 
-      {/* Category (Figma order 7) */}
+      {/* Category  */}
       {/* Mobile responsive: 352px wide select with compact height */}
       <div className="w-full max-w-[736px] mb-4 md:mb-6">
         <label className="block text-[17px] md:text-[35px] font-semibold text-black mb-2">Category</label>
@@ -261,15 +261,15 @@ const AddProduct: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile responsive: smaller editor height per Figma */}
+      {/* Mobile responsive: smaller editor height */}
       <ProductDescription
         value={form.description}
         onChange={(val) => handleChange('description', val)}
         className="w-full max-w-[736px] mb-8 md:mb-10"
       />
 
-      {/* Keywords Related Products (Figma order 6) */}
-      {/* Exact Figma dimensions: 736px width, 231px height */}
+      {/* Keywords Related Products */}
+      {/* Exact dimensions: 736px width, 231px height */}
       <div className="w-full max-w-[736px] mb-8 md:mb-10">
         <label className="block text-[17px] md:text-[35px] font-semibold text-black mb-2">Add Keywords Related Products</label>
         <textarea
@@ -295,7 +295,7 @@ const AddProduct: React.FC = () => {
       </div>
 
       {/* Sizes and colors */}
-      {/* Mobile responsive: sizes and colors in two columns per Figma */}
+      {/* Mobile responsive: sizes and colors in two columns  */}
       <div className="w-full max-w-[736px] grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-6 mb-8 md:mb-10">
         <div>
           <label className="block text-[17px] md:text-[35px] font-semibold text-black mb-2">Enter Product Size</label>
@@ -346,7 +346,7 @@ const AddProduct: React.FC = () => {
       </div>
 
       {/* Select Color - modular component */}
-      {/* Mobile responsive: color picker field width 168px per Figma */}
+      {/* Mobile responsive: color picker field width 168px */}
       <SelectColorField
         className="w-full max-w-[736px] mb-8 md:mb-10 relative"
         fieldWidthClass="w-[168px] md:w-1/2"

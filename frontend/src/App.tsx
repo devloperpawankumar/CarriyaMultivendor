@@ -10,6 +10,7 @@ const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const CheckoutReview = lazy(() => import('./pages/CheckoutReview'));
 const Payment = lazy(() => import('./pages/Payment'));
+const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const SellerSignup = lazy(() => import('./pages/SellerSignup'));
 const EmailVerification = lazy(() => import('./pages/EmailVerification'));
@@ -38,6 +39,7 @@ const ReturnRefundForm = lazy(() => import('./pages/returnRefundPolicy/ReturnRef
 const ContactUs = lazy(() => import('./pages/contactUs/ContactUs'));
 const HelpSupport = lazy(() => import('./pages/helpSupport/HelpSupport'));
 const SellerStore = lazy(() => import('./pages/SellerStore'));
+const MyOrders = lazy(() => import('./pages/MyOrders'));
 const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
 const AdminSeeTransaction = lazy(() => import('./pages/adminDashboard/SeeTransaction'));
 const AdminSellerDetails = lazy(() => import('./pages/adminDashboard/SellerDetails'));
@@ -57,6 +59,7 @@ function App() {
             <Route path="/checkout/review" element={<CheckoutReview />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/favorites" element={<Favorites />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/seller-signup" element={<SellerSignup />} />
             <Route path="/email-verification" element={<EmailVerification />} />
@@ -88,6 +91,7 @@ function App() {
             <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/help-support" element={<HelpSupport />} />
             <Route path="/sellerstore" element={<SellerStore />} />
+            <Route path="/my-orders" element={<MyOrders />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

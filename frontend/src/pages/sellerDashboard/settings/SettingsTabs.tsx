@@ -11,7 +11,7 @@ type SettingsTabsProps = {
 
 const tabs: Array<{ key: TabKey; label: string }> = [
   { key: 'store', label: 'Store Information' },
-  { key: 'documents', label: 'Business Documents' },
+  { key: 'documents', label: 'Personal Info' },
   { key: 'notifications', label: 'Notifications' },
   { key: 'shipping', label: 'Shipping Settings' },
 ];

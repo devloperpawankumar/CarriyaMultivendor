@@ -53,7 +53,7 @@ const ReturnedOrderDetailsPage: React.FC<ReturnedOrderDetailsPageProps> = ({ ord
           </div>
         </div>
 
-        {/* Content centered to max width per Figma (852px) */}
+        {/* Content centered to max width (852px) */}
         <div className="w-full flex justify-center">
           <div className="w-full max-w-[852px]">
             {/* Order ID */}

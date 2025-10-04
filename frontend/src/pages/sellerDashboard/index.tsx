@@ -53,7 +53,7 @@ const SellerDashboard: React.FC = () => {
       <div
         className="grid grid-cols-1 items-center gap-5 lg:[grid-template-columns:repeat(3,235px)] lg:[gap:50px] lg:justify-items-start"
       >
-        {/* Mobile responsive work: center card and set mobile width to match Figma */}
+        {/* Mobile responsive work: center card and set mobile width  */}
         <div className="w-full  max-w-[307px] lg:w-[235px]">
           <MetricCard
             title="Toady Sales"
@@ -63,7 +63,7 @@ const SellerDashboard: React.FC = () => {
           />
         </div>
 
-        {/* Mobile responsive work: center card and set mobile width to match Figma */}
+        {/* Mobile responsive work: center card and set mobile width  */}
         <div className="w-full max-w-[307px] lg:w-[235px]">
           <MetricCard
             title="Total Orders"
@@ -73,7 +73,7 @@ const SellerDashboard: React.FC = () => {
           />
         </div>
 
-        {/* Mobile responsive work: center card and set mobile width to match Figma */}
+        {/* Mobile responsive work: center card and set mobile width*/}
         <div className="w-full max-w-[307px] lg:w-[235px]">
           <MetricCard
             title="Pending Orders"

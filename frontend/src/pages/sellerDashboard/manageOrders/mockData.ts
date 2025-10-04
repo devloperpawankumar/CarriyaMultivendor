@@ -372,7 +372,7 @@ export const getAllMockOrders = (): Order[] => [
     date: '28/08/2025 , 10:07',
     payment: 'COD',
     amount: 'PKR 700',
-    status: 'canceled' as const // Using 'canceled' status for returned items as per Figma design
+    status: 'canceled' as const // Using 'canceled' status for returned items 
   },
   {
     id: '#D12346R',
@@ -576,7 +576,7 @@ export const getAllMockOrders = (): Order[] => [
     date: '28/08/2025 , 10:07',
     payment: 'COD',
     amount: 'PKR 700',
-    status: 'canceled' as const // Using 'canceled' status for returned items as per Figma design
+    status: 'canceled' as const // Using 'canceled' status for returned items 
   },
   {
     id: '#E12346MM',

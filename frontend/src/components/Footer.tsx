@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Layout - Based on Figma Design */}
+        {/* Mobile Layout  */}
         <div className="lg:hidden">
           <div className="px-[20px] py-5 max-[320px]:px-4">
             {/* Logo Section */}
@@ -101,7 +101,7 @@ const Footer: React.FC = () => {
               </p>
             </div>
 
-            {/* Content Grid - 3 columns as per Figma */}
+            {/* Content Grid - 3 columns */}
             <div className="grid grid-cols-3 gap-6 mb-8 max-[320px]:gap-4 max-[320px]:mb-6">
               {/* Company Column */}
               <div>

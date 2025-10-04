@@ -108,8 +108,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ sidebar, header, children }) 
 						{/* Single logo shown here; sidebar hides its own logo in mobile mode */}
 						<img src={require('../../assets/images/Carriya logo 1.png')} alt="Carriya" className="h-[29px] w-auto rounded" />
 						<div className="flex items-center gap-3">
-							<img src={require('../../assets/images/Seller/rightTop.png')} alt="right-top" className="w-5 h-5" />
-							<img src={require('../../assets/images/Seller/rightBottom.png')} alt="right-bottom" className="w-5 h-5" />
+							{/* <img src={require('../../assets/images/Seller/rightTop.png')} alt="right-top" className="w-5 h-5" />
+							<img src={require('../../assets/images/Seller/rightBottom.png')} alt="right-bottom" className="w-5 h-5" /> */}
 							<button aria-label="Close menu" className="p-2" onClick={() => setMenuOpen(false)}>
 								<span className="block w-4 h-4" style={{ position: 'relative' }}>
 									<span className="absolute inset-0 rotate-45 bg-black" style={{ height: 2, top: '50%' }} />

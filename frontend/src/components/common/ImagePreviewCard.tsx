@@ -10,7 +10,7 @@ type Props = {
 
 const ImagePreviewCard: React.FC<Props> = ({ urls, index, setIndex, cardStyle }) => {
   const len = urls.length;
-  // Enable chevrons on mobile even with a single image, per Figma behavior
+  // Enable chevrons on mobile even with a single image
   const [isMobile, setIsMobile] = React.useState(false);
   React.useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');

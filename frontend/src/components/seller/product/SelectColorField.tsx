@@ -70,7 +70,7 @@ const SelectColorField: React.FC<Props> = ({
 
   return (
     <div className={className}>
-      {/* Mobile responsive: smaller label per Figma */}
+      {/* Mobile responsive:  */}
       <label className="block text-[17px] md:text-[35px] font-semibold text-black mb-2">
         {label}
         {optionalHint && (

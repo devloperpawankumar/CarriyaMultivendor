@@ -10,7 +10,7 @@ type OverlayPillProps = {
 };
 
 const OverlayPill: React.FC<OverlayPillProps> = ({ countLabel, onPrev, onNext, disableNav, style, className }) => {
-  // Mobile responsiveness: scale to match Figma on <= 767px
+  // Mobile responsiveness: scale to match  on <= 767px
   const [isMobile, setIsMobile] = React.useState<boolean>(false);
 
   React.useEffect(() => {

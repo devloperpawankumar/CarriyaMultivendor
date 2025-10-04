@@ -35,7 +35,7 @@ const CartItemRow: React.FC<Props> = ({ id, title, image, price, compareAt, colo
           </button>
         </div>
         <div className="absolute left-0 right-0 top-[61px] h-px bg-[#B8B1B1]" />
-        {/* Left-side empty box beside image as per Figma */}
+        {/* Left-side empty box beside  */}
         <div className="absolute left-[23px] top-[111px] w-[26px] h-[26px] border border-[#949494] rounded-[5px] bg-white" />
         <div className="absolute left-[60px] top-[76px] w-[96px] h-[96px] rounded border border-[#2ECC71] bg-[#C7FFDF] overflow-hidden flex items-center justify-center">
           <img src={image} alt={title} className="w-full h-full object-cover" />
@@ -58,7 +58,7 @@ const CartItemRow: React.FC<Props> = ({ id, title, image, price, compareAt, colo
         </div>
       </div>
 
-      {/* Mobile Layout - matches Figma design */}
+      {/* Mobile Layout */}
       <div className="md:hidden p-4" style={{ height: 142 }}>
         {/* Top row: checkbox + shop name + heart + delete */}
         <div className="flex items-center justify-between mb-2">

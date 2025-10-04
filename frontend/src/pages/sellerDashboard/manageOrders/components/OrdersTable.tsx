@@ -12,7 +12,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder, loading }
 
   return (
     <div className="overflow-x-auto">
-      {/* Table Header - Exact Figma Design */}
+      {/* Table Header  */}
       <div className="bg-green-100 rounded-[10px] px-4 md:px-8 py-3 md:py-4 mb-3 md:mb-4" style={{ backgroundColor: 'rgba(46, 204, 113, 0.17)' }}>
         <div className="hidden sm:grid grid-cols-9 gap-1 text-[12px] md:text-[15px] font-extrabold text-gray-500">
           <div className="col-span-1">Order ID</div>
@@ -31,7 +31,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder, loading }
         </div>
       </div>
 
-      {/* Table Body - Exact Figma Design with rounded container */}
+      {/* Table Body -  Design with rounded container */}
       <div className="bg-white rounded-[10px] overflow-hidden border border-gray-200">
         {orders.map((order, index) => (
           <div
@@ -41,7 +41,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder, loading }
             }`}
           >
             <div className="hidden sm:grid grid-cols-9 gap-1 items-center">
-              {/* Order ID - Green color as per Figma */}
+              {/* Order ID  */}
               <div className="col-span-1">
                 <span className="text-[12px] md:text-[12px] font-extrabold text-green-500">
                   {order.id}

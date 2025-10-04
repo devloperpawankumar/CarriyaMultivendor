@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Stars from './Stars';
 import saleIcon from '../../assets/images/Icon (Stroke).png';
-import favIcon from '../../assets/images/outline.png';
 import cartIcon from '../../assets/images/Cart.png';
 import Arrows from '../../assets/images/Vector.png';
 import { useNavigate } from 'react-router-dom';
+import { useFavorites } from '../../contexts/FavoritesContext';
 
 const InfoPanel: React.FC<{
   price: number;
@@ -16,7 +16,10 @@ const InfoPanel: React.FC<{
   colors: string[];
   sizes: string[];
   onAddToCart?: (details: { quantity: number; color?: string; size?: string }) => void;
-}> = ({ price, compareAt, currency, sales, rating, reviews, colors, sizes, onAddToCart }) => {
+  productId: string;
+  productTitle: string;
+  productImage: string;
+}> = ({ price, compareAt, currency, sales, rating, reviews, colors, sizes, onAddToCart, productId, productTitle, productImage }) => {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [dropdownColor, setDropdownColor] = useState(colors[0]);
   const [dropdownSize, setDropdownSize] = useState(sizes[0]);
@@ -24,6 +27,8 @@ const InfoPanel: React.FC<{
   const [colorOpen, setColorOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
+  const { items: favoriteItems, toggle: toggleFavorite } = useFavorites();
+  const isFavorite = useMemo(() => favoriteItems.some(i => i.id === productId), [favoriteItems, productId]);
   return (
     <div>
       <div className="flex items-end justify-between mb-6">
@@ -103,9 +108,26 @@ const InfoPanel: React.FC<{
             <span className="text-[14px] font-bold tracking-[0.5px]">Add to cart</span>
           </button>
 
-          <button className="h-11 border border-[#2ECC71] text-[#2ECC71] rounded flex items-center justify-center gap-2 px-8">
-            <img src={favIcon} alt="icon" className="w-5 h-5 object-contain" />
-            <span className="text-[14px] font-bold tracking-[0.5px]">Favorite</span>
+          <button
+            className={`h-11 border rounded flex items-center justify-center gap-2 px-8 ${isFavorite ? 'border-[#2ECC71] text-white bg-[#2ECC71]' : 'border-[#2ECC71] text-[#2ECC71]'}`}
+            onClick={() => toggleFavorite({ id: productId, title: productTitle, image: productImage })}
+            aria-pressed={isFavorite}
+            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill={isFavorite ? '#2ECC71' : 'none'}
+              xmlns="http://www.w3.org/2000/svg"
+              stroke={isFavorite ? 'white' : '#2ECC71'}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span className="text-[14px] font-bold tracking-[0.5px]">{isFavorite ? 'Favorited' : 'Favorite'}</span>
           </button>
         </div>
 

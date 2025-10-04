@@ -11,7 +11,7 @@ function HelpSupport() {
         Carriya - Buy , Sell And Carry
       </div>
 
-      {/* Banner with overlay and title (mirrors ContactUs layout) */}
+      {/* Banner with overlay and title ) */}
       <div className="w-full relative">
         <div className="w-full h-[180px] md:h-[218px] relative">
           <img src={ContactBanner} alt="Help & Support banner" className="w-full h-full object-cover" />
@@ -22,7 +22,7 @@ function HelpSupport() {
         </div>
       </div>
 
-      {/* Light green section - centered help content per Figma */}
+      {/* Light green section - centered */}
       <div className="w-full" style={{ backgroundColor: 'rgba(46, 204, 113, 0.18)' }}>
         <div className="mx-auto max-w-[1160px] px-4 md:px-0 py-8 md:py-12">
           <div className="flex flex-col items-center text-center">

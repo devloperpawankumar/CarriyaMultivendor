@@ -17,7 +17,7 @@ import cartIcon from '../assets/images/Cart.png';
 import { useCart } from '../contexts/CartContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 
-// Dummy data builder matching Figma exactly
+// Dummy data builder
 function useDummyProduct(id: string) {
   return useMemo(() => ({
     id,
@@ -136,6 +136,9 @@ const ProductDetail: React.FC = () => {
             reviews={product.reviews}
             colors={product.colors}
             sizes={product.sizes}
+            productId={product.id}
+            productTitle={product.title}
+            productImage={product.images[0]}
             onAddToCart={(d) => { 
               addItem({
                 title: product.title,
@@ -154,7 +157,7 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile-only layout matching Figma node 362:639 */}
+        {/* Mobile-only layout  */}
         <div className="md:hidden mt-4">
           {/* First top border */}
           <div className="border-t border-[#E5E8ED] mb-4" />
@@ -366,7 +369,7 @@ const ProductDetail: React.FC = () => {
 </div>
 
 
-            {/* Mobile Reviews placed after actions (per Figma) */}
+            {/* Mobile Reviews placed after actions   */}
             <div className="mt-6">
               <h2 className="text-[24px] font-bold text-black mb-3">Reviews</h2>
               <ReviewsBlock items={product.reviewsList} />
@@ -374,10 +377,10 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Divider line - matching Figma (desktop spacing) */}
+        {/* Divider line  */}
         <div className="w-full h-px bg-[#E5E8ED] my-8 hidden md:block"></div>
 
-        {/* Below: left description, right reviews (desktop only) */}
+          {/* Below: left description, right reviews (desktop only) */}
         <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-8">
           <DescriptionBlock text={product.description} />
           <ReviewsBlock items={product.reviewsList} />

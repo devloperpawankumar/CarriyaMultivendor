@@ -43,7 +43,7 @@ const SignupLayout: React.FC<SignupLayoutProps> = ({
               onClick={() => window.location.href = '/login'}
               className="text-black underline md:no-underline"
             >
-              Sign in
+              Log in
             </button>
           </div>
         </div>

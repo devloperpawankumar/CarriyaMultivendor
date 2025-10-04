@@ -110,7 +110,7 @@ const Cart: React.FC = () => {
               ))}
             </div>
 
-            {/* Right column Order Summary (Frame 1000004160) */}
+            {/* Right column Order Summary  */}
             <OrderSummary subtotal={totals.subtotal} shipping={totals.shipping} discount={totals.discount} total={totals.total} />
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SignupLayout from '../components/auth/SignupLayout';
 import FormField from '../components/auth/FormField';
@@ -10,6 +10,7 @@ const WhatsAppOTPVerification: React.FC = () => {
   const navigate = useNavigate();
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '']);
   const [userType, setUserType] = useState<'buyer' | 'seller'>('seller');
+  const [isLocked, setIsLocked] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -17,6 +18,15 @@ const WhatsAppOTPVerification: React.FC = () => {
     confirmPassword: '',
   });
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Enforce seller flow lock on OTP page
+  useEffect(() => {
+    try {
+      localStorage.setItem('flowLock', 'seller');
+      setIsLocked(true);
+      setUserType('seller');
+    } catch {}
+  }, []);
 
   const handleOtpChange = (index: number, value: string) => {
     const newOtp = [...otp];
@@ -75,13 +85,17 @@ const WhatsAppOTPVerification: React.FC = () => {
 
         {/* User Type Toggle */}
         <div className="mb-6 md:mb-8">
-          {/* Mobile: center toggle and cap width to 302px to match Figma; desktop uses wider */}
-          <div className="mx-auto max-w-[302px] md:max-w-[469px] w-full py-4">
+          {/* Mobile: center toggle and cap width to 302px to match ; desktop uses wider */}
+          <div className={`mx-auto max-w-[302px] md:max-w-[469px] w-full py-4 ${isLocked ? 'opacity-60 pointer-events-none' : ''}`} aria-disabled={isLocked}>
             <UserTypeToggle
               userType={userType}
-              onUserTypeChange={(t) => setUserType(t)}
+              onUserTypeChange={(t) => {
+                if (isLocked && t === 'buyer') return;
+                setUserType(t);
+              }}
             />
           </div>
+          {/* helper text intentionally hidden per requirement */}
         </div>
 
       
