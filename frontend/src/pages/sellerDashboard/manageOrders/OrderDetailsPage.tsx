@@ -324,6 +324,29 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Accept and Cancel Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
+            <button
+              onClick={() => {
+                console.log('Order accepted');
+                // Add your accept order logic here
+              }}
+              className="bg-green-500 text-white px-6 sm:px-8 py-3 rounded-[15px] sm:rounded-[20px] text-[16px] sm:text-[18px] lg:text-[20px] font-bold hover:bg-green-600 active:bg-green-700 transition-all duration-200 w-full sm:w-auto touch-manipulation"
+            >
+              Accept
+            </button>
+            
+            <button
+              onClick={() => {
+                console.log('Order cancelled');
+                // Add your cancel order logic here
+              }}
+              className="bg-red-500 text-white px-6 sm:px-8 py-3 rounded-[15px] sm:rounded-[20px] text-[16px] sm:text-[18px] lg:text-[20px] font-bold hover:bg-red-600 active:bg-red-700 transition-all duration-200 w-full sm:w-auto touch-manipulation"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </SellerScaffold>
