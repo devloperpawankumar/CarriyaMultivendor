@@ -1,6 +1,6 @@
 import React from 'react';
 import Footer from '../../components/Footer';
-import ContactBanner from '../../assets/images/Contactus/Orange Modern Construction Company Promotion LinkedIn Banner (3).svg';
+import ContactBanner from '../../assets/images/Contactus/ContacusBanner.jpg';
 
 import Instagram from '../../assets/images/Contactus/social-instagram.png';
 import Twitter from '../../assets/images/Contactus/social-twitter.png';
@@ -20,8 +20,8 @@ const ContactUs: React.FC = () => {
 
       {/* Banner with overlay and title */}
       <div className="w-full relative">
-        <div className="w-full mt-0.4 md:mt-0.9 h-[100px] md:h-[300px] relative">
-          <img src={ContactBanner} alt="Contact banner" className="w-full h-full object-cover object-top" />
+        <div className="w-full mt-0.4 md:mt-0.9 h-[130px] md:h-[300px] relative">
+          <img src={ContactBanner} alt="Contact banner" className="w-full h-full md:object-cover object-center md:object-top" />
           {/* <div className="absolute inset-0 bg-green-400/20" /> */}
           <div className="absolute inset-0 flex items-center justify-center">
             {/* <h1 className="text-white text-[28px] md:text-[50px] font-semibold">Contact us</h1> */}

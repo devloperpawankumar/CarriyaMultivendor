@@ -260,7 +260,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
       </NavLink>
 
       <NavLink
-        to="/sell"
+        to="/seller-signup"
         className={({ isActive }) =>
           isActive
             ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
