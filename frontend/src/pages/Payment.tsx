@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CategoryMenu from '../components/CategoryMenu';
+import { useClickOutside } from '../hooks/useClickOutside';
 import PaymentOrderSummary from '../components/payment/PaymentOrderSummary';
 import PaymentMethodsGrid from '../components/payment/PaymentMethodsGrid';
 import PaymentMethodsGridMobile from '../components/payment/PaymentMethodsGridMobile';
@@ -15,7 +16,15 @@ const Payment: React.FC = () => {
   const navigate = useNavigate();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
   const [showCategories, setShowCategories] = useState(false);
+  const browseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const categoriesDropdownRef = useRef<HTMLDivElement | null>(null);
   const hasDetails = selectedPaymentMethod === 'bank-transfer' || selectedPaymentMethod === 'jazzcash' || selectedPaymentMethod === 'easypaisa' || selectedPaymentMethod === 'cod';
+  useClickOutside(() => setShowCategories(false), {
+    enabled: showCategories,
+    include: [browseButtonRef, categoriesDropdownRef],
+    escapeCloses: true,
+    eventType: 'mousedown',
+  });
 
   const handlePaymentMethodSelect = (methodId: string) => {
     setSelectedPaymentMethod(methodId);
@@ -37,7 +46,7 @@ const Payment: React.FC = () => {
       
       {/* Mobile Layout */}
       <div className="md:hidden">
-        <main className={`px-0 pt-8 ${hasDetails ? 'pb-[80px]' : 'pb-[120px]'}`}>
+        <main className={`px-0 pt-8 ${hasDetails ? 'pb-[90px]' : 'pb-[120px]'}`}>
           <div className="relative mx-auto" style={{ width: 343 }}>
             {!selectedPaymentMethod && (
               <div className="mb-6">
@@ -77,6 +86,7 @@ const Payment: React.FC = () => {
           {/* Browse Categories - Desktop */}
           <div className="relative mb-8">
             <button 
+              ref={browseButtonRef}
               onClick={() => setShowCategories(v => !v)} 
               className="inline-flex items-center space-x-2 text-[#2ECC71] font-bold text-sm"
             >
@@ -86,7 +96,7 @@ const Payment: React.FC = () => {
               <span>Browse Categories</span>
             </button>
             {showCategories && (
-              <div className="absolute z-50 mt-2">
+              <div className="absolute z-50 mt-2" ref={categoriesDropdownRef}>
                 <CategoryMenu />
               </div>
             )}

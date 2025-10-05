@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CategoryMenu from '../components/CategoryMenu';
+import { useClickOutside } from '../hooks/useClickOutside';
 import homeIcon from '../assets/images/Payment/Frame (2).png';
 import officeIcon from '../assets/images/Payment/Frame (3).png';
 import arrowIcon from '../assets/images/Product/_.png';
@@ -9,6 +10,14 @@ import locations from '../data/locations';
 
 const Checkout: React.FC = () => {
   const [showCategories, setShowCategories] = useState(false);
+  const browseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const categoriesDropdownRef = useRef<HTMLDivElement | null>(null);
+  useClickOutside(() => setShowCategories(false), {
+    enabled: showCategories,
+    include: [browseButtonRef, categoriesDropdownRef],
+    escapeCloses: true,
+    eventType: 'mousedown',
+  });
  
 
   const [province, setProvince] = useState('');
@@ -30,14 +39,14 @@ const Checkout: React.FC = () => {
       <div className="max-w-[1200px] mx-auto px-4 py-8">
         {/* Browse Categories (hidden on mobile) */}
         <div className="relative mb-4 hidden md:block">
-          <button onClick={() => setShowCategories(v => !v)} className="inline-flex items-center space-x-2 text-[#2ECC71] font-bold text-sm">
+          <button ref={browseButtonRef} onClick={() => setShowCategories(v => !v)} className="inline-flex items-center space-x-2 text-[#2ECC71] font-bold text-sm">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path d="M4 6h16M4 12h16M4 18h16" stroke="#2ECC71" strokeWidth="2" strokeLinecap="round"/>
             </svg>
             <span>Browse Categories</span>
           </button>
           {showCategories && (
-            <div className="absolute z-50 mt-2">
+            <div className="absolute z-50 mt-2" ref={categoriesDropdownRef}>
               <CategoryMenu />
             </div>
           )}

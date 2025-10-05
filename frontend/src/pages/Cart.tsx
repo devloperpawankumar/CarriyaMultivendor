@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -7,11 +7,21 @@ import CartHeader from '../components/cart/CartHeader';
 import CartItemRow from '../components/cart/CartItemRow';
 import OrderSummary from '../components/cart/OrderSummary';
 import { useCart } from '../contexts/CartContext';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 const Cart: React.FC = () => {
   const { items, totals, updateQuantity, removeItem, clearCart } = useCart();
   const [showCategories, setShowCategories] = useState(false);
+  const browseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const categoriesDropdownRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+
+  useClickOutside(() => setShowCategories(false), {
+    enabled: showCategories,
+    include: [browseButtonRef, categoriesDropdownRef],
+    escapeCloses: true,
+    eventType: 'mousedown',
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -19,14 +29,14 @@ const Cart: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6">
         {/* Browse Categories (hidden on mobile) */}
         <div className="relative mb-4 hidden md:block">
-          <button onClick={() => setShowCategories(v => !v)} className="inline-flex items-center space-x-2 text-[#2ECC71] font-bold text-sm">
+          <button ref={browseButtonRef} onClick={() => setShowCategories(v => !v)} className="inline-flex items-center space-x-2 text-[#2ECC71] font-bold text-sm">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path d="M4 6h18M4 12h18M4 18h18" stroke="#2ECC71" strokeWidth="2" strokeLinecap="round"/>
             </svg>
             <span>Browse Categories</span>
           </button>
           {showCategories && (
-            <div className="absolute z-50 mt-2">
+            <div className="absolute z-50 mt-2" ref={categoriesDropdownRef}>
               <CategoryMenu />
             </div>
           )}

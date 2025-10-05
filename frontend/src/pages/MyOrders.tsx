@@ -12,9 +12,17 @@ const MyOrders: React.FC = () => {
   const reviewSectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (showReview && reviewSectionRef.current) {
+    if (!showReview) return;
+    const target = reviewSectionRef.current;
+    if (!target) return;
+
+    if (window.innerWidth >= 768) {
+      const headerOffsetPx = 100; // adjust if header height changes
+      const targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerOffsetPx;
+      window.scrollTo({ top: targetTop, behavior: 'smooth' });
+    } else {
       try {
-        reviewSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch {}
     }
   }, [showReview]);

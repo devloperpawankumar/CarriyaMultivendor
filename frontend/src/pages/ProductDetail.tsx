@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -16,6 +16,7 @@ import saleIcon from '../assets/images/Icon (Stroke).png';
 import cartIcon from '../assets/images/Cart.png';
 import { useCart } from '../contexts/CartContext';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 // Dummy data builder
 function useDummyProduct(id: string) {
@@ -63,6 +64,8 @@ const ProductDetail: React.FC = () => {
   const isFavorite = useMemo(() => favoriteItems.some(i => i.id === product.id), [favoriteItems, product.id]);
   const [showAddToast, setShowAddToast] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
+  const browseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const categoriesDropdownRef = useRef<HTMLDivElement | null>(null);
   const [cartDetails, setCartDetails] = useState<{ quantity: number; color?: string; size?: string } | null>(null);
   const [mobileQuantity, setMobileQuantity] = useState(1);
   const [mobileSelectedColor, setMobileSelectedColor] = useState<string | undefined>(undefined);
@@ -79,6 +82,13 @@ const ProductDetail: React.FC = () => {
     }
   }, [productId]);
 
+  useClickOutside(() => setShowCategories(false), {
+    enabled: showCategories,
+    include: [browseButtonRef, categoriesDropdownRef],
+    escapeCloses: true,
+    eventType: 'mousedown',
+  });
+
   return (
     <div className="min-h-screen bg-white">
       <Header variant="simple" />
@@ -89,6 +99,7 @@ const ProductDetail: React.FC = () => {
         <div className="relative mb-4 flex items-center">
           {/* Desktop: keep current styling */}
           <button
+            ref={browseButtonRef}
             onClick={() => setShowCategories((v) => !v)}
             className="hidden md:inline-flex items-center space-x-2 text-[#2ECC71] font-bold text-sm"
           >
@@ -101,7 +112,7 @@ const ProductDetail: React.FC = () => {
      
 
           {showCategories && (
-            <div className="absolute z-50 top-full  mt-2">
+            <div className="absolute z-50 top-full  mt-2" ref={categoriesDropdownRef}>
               <CategoryMenu />
             </div>
             
