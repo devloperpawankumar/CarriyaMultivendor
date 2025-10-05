@@ -3,13 +3,13 @@ import Footer from '../../components/Footer';
 import ContactBanner from '../../assets/images/ContactUs banner.png';
 import phoneIcon from '../../assets/images/Contactus/CallContactus.png';
 import emailIcon from '../../assets/images/Contactus/Email.png';
+import Header from '../../components/Header';
 
 function HelpSupport() {
   return (
     <div className="w-full">
-      <div className="w-full h-10 bg-carriya-green flex items-center justify-center text-white text-sm md:text-base font-medium">
-        Carriya - Buy , Sell And Carry
-      </div>
+      <Header variant='full' />
+     
 
       {/* Banner with overlay and title ) */}
       <div className="w-full relative">

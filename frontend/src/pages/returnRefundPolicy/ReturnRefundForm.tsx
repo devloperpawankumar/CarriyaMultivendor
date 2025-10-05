@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Footer from '../../components/Footer';
 import UploadImg from '../../assets/images/auth/Upload.png';
+import Header from '../../components/Header';
 
 const inputBase = 'w-full rounded-[10px] border border-[#E2E0E0] h-[80px] md:h-[80px] px-4 md:px-6 text-[20px] placeholder-[#949494] outline-none';
 
@@ -8,9 +9,7 @@ const ReturnRefundForm: React.FC = () => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   return (
     <div className="w-full">
-      <div className="w-full h-10 bg-carriya-green flex items-center justify-center text-white text-sm md:text-base font-medium">
-        Carriya - Buy , Sell And Carry
-      </div>
+      <Header variant='full' />
 
       <div className="mx-auto max-w-[1160px] px-4 md:px-0">
         <div className="mt-8 md:mt-10 text-center">

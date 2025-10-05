@@ -1,13 +1,11 @@
 import React from 'react';
 import Footer from '../../components/Footer';
+import Header from '../../components/Header';
 
 const ReturnRefundPolicy: React.FC = () => {
   return (
     <div className="w-full">
-      {/* Top green bar */}
-      <div className="w-full h-10 bg-carriya-green flex items-center justify-center text-white text-sm md:text-base font-medium">
-        Carriya - Buy , Sell And Carry
-      </div>
+    <Header variant='full' />
 
       {/* Header/title block  */}
       <div className="mx-auto max-w-[1160px]">
