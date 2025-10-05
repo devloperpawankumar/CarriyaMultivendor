@@ -116,12 +116,12 @@ const CheckoutReview: React.FC = () => {
 
 
 			{/* Proceed button */}
-			<div className="flex justify-center mt-8">
+			<div className="flex justify-start mt-8">
 				<button 
 					onClick={() => navigate('/payment')}
-					className="w-full max-w-[400px] h-[55px] bg-[#2ECC71] rounded-[8px] text-white text-[20px] font-semibold hover:bg-[#29b862] transition-colors"
+					className="ml-auto w-[254px] h-[68px] rounded-[15px] bg-[#2ECC71] text-white text-[35px] font-medium"
 				>
-					Proceed to payment
+					Proceed
 				</button>
 			</div>
 		</div>
@@ -176,7 +176,7 @@ const CheckoutReview: React.FC = () => {
 			<div className="flex justify-center mt-2">
 				<button 
 					onClick={() => navigate('/payment')}
-					className="w-[140px] h-[26px] bg-[#2ECC71] text-white rounded-[5px] text-[13px] font-bold flex items-center justify-center"
+					className="w-[180px] h-[35px] bg-[#2ECC71] text-white rounded-[5px] text-[18px] font-bold flex items-center justify-center"
 				>
 					Proceed to payment
 				</button>

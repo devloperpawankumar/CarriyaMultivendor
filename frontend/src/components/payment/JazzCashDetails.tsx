@@ -43,7 +43,7 @@ const JazzCashDetails: React.FC<JazzCashDetailsProps> = ({ className = '' }) => 
 
       {/* ✅ Mobile Pay now button: centered */}
       <div className="pt-2 flex justify-center md:hidden">
-        <button className="w-[69px] h-[26px] bg-[#2ECC71] rounded-[5px] text-[13px] font-semibold text-white">
+        <button className="w-[170px] h-[35px] bg-[#2ECC71] rounded-[5px] text-[15px] font-semibold text-white">
           Pay now
         </button>
       </div>

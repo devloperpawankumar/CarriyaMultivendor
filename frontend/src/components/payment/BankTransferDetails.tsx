@@ -37,7 +37,7 @@ const BankTransferDetails: React.FC<BankTransferDetailsProps> = ({ className = '
 
       {/* ✅ Pay now button: centered on mobile, left on desktop */}
       <div className="pt-2 flex justify-center md:justify-start">
-        <button className="block w-[69px] md:w-[250px] h-[26px] md:h-[70px] bg-[#2ECC71] rounded-[5px] md:rounded-[15px] text-[13px] md:text-[35px] font-semibold text-white">
+        <button className="block w-[170px] md:w-[250px] h-[35px] md:h-[70px] bg-[#2ECC71] rounded-[5px] md:rounded-[15px] text-[15px] md:text-[35px] font-semibold text-white">
           Pay now
         </button>
       </div>

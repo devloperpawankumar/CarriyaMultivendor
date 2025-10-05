@@ -139,13 +139,13 @@ const Checkout: React.FC = () => {
 
           {/* Controls below form : Home, Office, Next */}
           <div className="flex flex-wrap gap-4 items-center mt-8">
-            <div className="flex items-center gap-2 border border-[#DADADA] rounded-[10px] shadow-sm px-4 py-3">
+            <div className="flex items-center gap-2 border border-[#DADADA] rounded-[15px] shadow-sm px-4 py-3">
              <img src={homeIcon} alt="Home" />
-              <span className="text-[#949494] text-[25px] leading-none">Home</span>
+              <span className="text-[#949494] text-[35px] leading-none">Home</span>
             </div>
-            <div className="flex items-center gap-2 border border-[#DADADA] rounded-[10px] shadow-sm px-4 py-3">
+            <div className="flex items-center gap-2 border border-[#DADADA] rounded-[15px] shadow-sm px-4 py-3">
            <img src={officeIcon} alt="Office" />
-              <span className="text-[#949494] text-[25px] leading-none">Office</span>
+              <span className="text-[#949494] text-[35px] leading-none">Office</span>
             </div>
             <button onClick={() => window.location.assign('/checkout/review')} className="ml-auto w-[254px] h-[68px] rounded-[15px] bg-[#2ECC71] text-white text-[35px] font-medium">Next</button>
           </div>
@@ -233,12 +233,12 @@ const Checkout: React.FC = () => {
 
           {/* Home and Office buttons - mobile layout */}
           <div className="flex gap-4 justify-center mt-8">
-            <div className="flex items-center gap-2 border border-[#B8B1B1] rounded-[10px] shadow-[1px_2px_4px_rgba(0,0,0,0.25)] px-4 py-2" style={{ width: 104.44, height: 37.78 }}>
-              <img src={homeIcon} alt="Home" className="w-[25px] h-[25px]" />
+            <div className="flex items-center gap-2 border border-[#B8B1B1] rounded-[5px] shadow-[1px_2px_4px_rgba(0,0,0,0.25)] px-4 py-2" style={{ width: 104.44, height: 37.78 }}>
+              <img src={homeIcon} alt="Home" className="w-[20px] h-[20px]" />
               <span className="text-[#949494] text-[15px] font-medium">Home</span>
             </div>
-            <div className="flex items-center gap-2 border border-[#B8B1B1] rounded-[10px] shadow-[1px_2px_4px_rgba(0,0,0,0.25)] px-4 py-2" style={{ width: 104.44, height: 37.78 }}>
-              <img src={officeIcon} alt="Office" className="w-[24px] h-[24px]" />
+            <div className="flex items-center gap-2 border border-[#B8B1B1] rounded-[5px] shadow-[1px_2px_4px_rgba(0,0,0,0.25)] px-4 py-2" style={{ width: 104.44, height: 37.78 }}>
+              <img src={officeIcon} alt="Office" className="w-[20px] h-[20px]" />
               <span className="text-[#949494] text-[15px] font-medium">Office</span>
             </div>
           </div>
@@ -247,7 +247,7 @@ const Checkout: React.FC = () => {
           <div className="flex justify-center mt-6">
             <button 
               onClick={() => window.location.assign('/checkout/review')} 
-              className="w-[60px] h-[26px] rounded-[5px] bg-[#2ECC71] text-white text-[13px] font-bold flex items-center justify-center"
+              className="w-[170px] h-[35px] rounded-[5px] bg-[#2ECC71] text-white text-[15px] font-bold flex items-center justify-center"
             >
               Next
             </button>

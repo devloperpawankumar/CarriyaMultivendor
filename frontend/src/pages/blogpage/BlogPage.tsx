@@ -4,6 +4,7 @@ import Blogpagehero from '../../assets/images/Blog/m-post-card-overlay.png';
 import Post from '../../assets/images/Blog/Rectangle 38.png';
 import Author from '../../assets/images/Blog/auth.png';
 import Authorimg from '../../assets/images/Blog/authimage.png';
+import Header from '../../components/Header';
 
 
 function getOptionalImage(relativePath: string): string {
@@ -30,9 +31,7 @@ const posts = [
 const BlogPage: React.FC = () => {
   return (
     <div className="w-full">
-      <div className="w-full h-10 bg-carriya-green flex items-center justify-center text-white text-sm md:text-base font-medium">
-        Carriya - Buy , Sell And Carry
-      </div>
+      <Header variant="full" />
       <div className="mx-auto max-w-[1216px] px-4 sm:px-6 lg:px-0">
         <div className="mt-8 grid place-items-center text-center">
           <h1 className="text-[32px] leading-[1.2] font-semibold md:text-[56px]">Explore Our<br />

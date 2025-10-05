@@ -71,7 +71,7 @@ const Cart: React.FC = () => {
           <div className="flex justify-center mt-6">
             <button
               onClick={() => navigate('/checkout')}
-              className="w-[140px] h-[26px] bg-[#2ECC71] text-white rounded-[5px] text-[13px] font-bold flex items-center justify-center"
+              className="w-[170px] h-[35px] bg-[#2ECC71] text-white rounded-[5px] text-[15px] font-bold flex items-center justify-center"
             >
               Proceed to checkout
             </button>

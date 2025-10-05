@@ -37,7 +37,7 @@ const Payment: React.FC = () => {
       
       {/* Mobile Layout */}
       <div className="md:hidden">
-        <main className={`px-0 pt-8 ${hasDetails ? 'pb-[20px]' : 'pb-[120px]'}`}>
+        <main className={`px-0 pt-8 ${hasDetails ? 'pb-[80px]' : 'pb-[120px]'}`}>
           <div className="relative mx-auto" style={{ width: 343 }}>
             {!selectedPaymentMethod && (
               <div className="mb-6">

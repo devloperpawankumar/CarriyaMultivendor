@@ -8,7 +8,7 @@ const CODDetails: React.FC<CODDetailsProps> = ({ className = '' }) => {
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Optional helper text for COD */}
-      <div className="text-[15px] text-black">
+      <div className="text-[14px] text-black">
         Cash on Delivery: Pay in cash when your order arrives.
       </div>
 
@@ -20,16 +20,25 @@ const CODDetails: React.FC<CODDetailsProps> = ({ className = '' }) => {
           md:justify-start    /* 💻 align left on desktop */
         "
       >
+
+ {/* ✅ Mobile Pay now button: centered
+ <div className="pt-2 flex justify-center md:hidden">
+        <button className="w-[69px] h-[26px] bg-[#2ECC71] rounded-[5px] text-[13px] font-semibold text-white">
+          Pay now
+        </button>
+      </div> */}
+
+
         <button
           className="
-            w-[180px] h-[45px] text-[16px]       /* 📱 default mobile size */
+            w-[170px] h-[35px] text-[15px]       /* 📱 default mobile size */
             sm:w-[220px] sm:h-[55px] sm:text-[20px]  /* tablets */
-            md:w-[289px] md:h-[70px] md:text-[35px]  /* desktop size */
-            bg-[#2ECC71] rounded-[10px] md:rounded-[15px]
+            md:w-[250px] md:h-[70px] md:text-[35px]  /* desktop size */
+            bg-[#2ECC71] rounded-[5px] md:rounded-[15px]
             font-semibold text-white
           "
         >
-          Complete Order
+          Complete
         </button>
       </div>
     </div>
