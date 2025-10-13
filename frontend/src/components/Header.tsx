@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import logoImg from "../assets/images/Carriya logo 1.png";
 import searchIcon from "../assets/images/searchicon.png";
 import favIcon from "../assets/images/Favourite Products icon.png";
-import cartIcon from "../assets/images/Cart icon.png";
+import cartIcon from "../assets/images/Cart icon (1).png";
 import userIcon from "../assets/images/account.png";
 import menuIcon from "../assets/images/MENU.png";
 import CategoryMenu from "./CategoryMenu";
