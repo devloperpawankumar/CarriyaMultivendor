@@ -1,5 +1,6 @@
 import React from 'react';
 import { OrderTableProps } from '../types/orderTypes';
+import placeholderProduct from '../../../../assets/images/Product/prodcut1.png';
 
 const CanceledReturnedOrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder, loading }) => {
   if (loading) {
@@ -34,7 +35,7 @@ const CanceledReturnedOrdersTable: React.FC<OrderTableProps> = ({ orders, onView
       {/* Table Body - Exact same structure as ProcessingOrdersTable with different colors */}
       <div className="bg-white rounded-[10px] overflow-hidden border border-gray-200">
         {orders.map((order, index) => {
-          const isReturned = order.id.startsWith('#E');
+          const isReturned = order.sellerStatus === 'refunded';
           const orderIdColor = isReturned ? 'text-yellow-600' : 'text-red-500';
           const amountColor = isReturned ? 'text-yellow-500' : 'text-red-500';
           const buttonColor = isReturned ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600';
@@ -51,7 +52,7 @@ const CanceledReturnedOrdersTable: React.FC<OrderTableProps> = ({ orders, onView
                 {/* Order ID - Different colors for canceled vs returned */}
                 <div className="col-span-1">
                   <span className={`text-[12px] font-extrabold ${orderIdColor}`}>
-                    {order.id}
+                    {order.orderNumber || order.id}
                   </span>
                 </div>
 
@@ -78,7 +79,8 @@ const CanceledReturnedOrdersTable: React.FC<OrderTableProps> = ({ orders, onView
                       className="w-[35px] h-[35px] object-cover rounded-[5px]"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/static/media/prodcut1.6413c0aafe4eecade91e.png';
+                      target.onerror = null;
+                      target.src = placeholderProduct;
                       }}
                     />
                   </div>
@@ -108,7 +110,12 @@ const CanceledReturnedOrdersTable: React.FC<OrderTableProps> = ({ orders, onView
                 {/* Action Button - Different colors and text for canceled vs returned */}
                 <div className="col-span-1">
                   <button
-                    onClick={() => onViewOrder(order.id)}
+                    onClick={() => {
+                      const orderIdentifier = order.orderNumber || order.id;
+                      if (orderIdentifier) {
+                        onViewOrder(orderIdentifier);
+                      }
+                    }}
                     className={`text-white px-2 py-1 rounded-[5px] text-[12px] font-bold transition-colors whitespace-nowrap w-full ${buttonColor}`}
                   >
                     {buttonText}
@@ -121,7 +128,9 @@ const CanceledReturnedOrdersTable: React.FC<OrderTableProps> = ({ orders, onView
                 {/* Header Row - Order ID, Date, and Status */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className={`text-[12px] font-extrabold ${orderIdColor}`}>{order.id}</span>
+                    <span className={`text-[12px] font-extrabold ${orderIdColor}`}>
+                      {order.orderNumber || order.id}
+                    </span>
                     {/* Status Badge */}
                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${
                       isReturned ? 'bg-yellow-100 text-yellow-600' : 'bg-red-100 text-red-600'
@@ -141,7 +150,8 @@ const CanceledReturnedOrdersTable: React.FC<OrderTableProps> = ({ orders, onView
                       className="w-[36px] h-[36px] object-cover rounded-[5px]"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/static/media/prodcut1.6413c0aafe4eecade91e.png';
+                      target.onerror = null;
+                      target.src = placeholderProduct;
                       }}
                     />
                   </div>
@@ -162,7 +172,12 @@ const CanceledReturnedOrdersTable: React.FC<OrderTableProps> = ({ orders, onView
                     <span className={`text-[12px] font-bold ${amountColor}`}>{order.amount}</span>
                   </div>
                   <button
-                    onClick={() => onViewOrder(order.id)}
+                    onClick={() => {
+                      const orderIdentifier = order.orderNumber || order.id;
+                      if (orderIdentifier) {
+                        onViewOrder(orderIdentifier);
+                      }
+                    }}
                     className={`text-white px-3 py-2 rounded-[8px] text-[11px] font-bold transition-colors shadow-sm ${buttonColor}`}
                   >
                     {isReturned ? 'View Return' : 'View Cancel'}

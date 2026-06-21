@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import colorNamer from "color-namer";
 
 type ColorItem = { name: string; hex: string };
 
@@ -11,6 +12,59 @@ type Props = {
   onChangeColors?: (colors: ColorItem[]) => void;
   className?: string;
   fieldWidthClass?: string;
+};
+
+const FALLBACK_COLOR_MAP: Record<string, string> = {
+  '#000000': 'Black',
+  '#FFFFFF': 'White',
+  '#FF3B30': 'Red',
+  '#FF9500': 'Orange',
+  '#FFCC00': 'Yellow',
+  '#34C759': 'Green',
+  '#5AC8FA': 'Sky Blue',
+  '#007AFF': 'Blue',
+  '#5856D6': 'Purple',
+  '#AF52DE': 'Violet',
+  '#FF2D55': 'Pink',
+  '#8E8E93': 'Gray',
+  '#C7C7CC': 'Light Gray',
+  '#E5E5EA': 'Very Light Gray',
+  '#F2F2F7': 'Off White',
+  '#C0392B': 'Dark Red',
+  '#27AE60': 'Dark Green',
+  '#2980B9': 'Dark Blue',
+  '#8E44AD': 'Dark Purple',
+  '#D35400': 'Dark Orange',
+};
+
+const pickClosestName = (hex: string): string => {
+  try {
+    const result = colorNamer(hex);
+    return (
+      result?.ntc?.[0]?.name ||
+      result?.pantone?.[0]?.name ||
+      result?.html?.[0]?.name ||
+      result?.basic?.[0]?.name ||
+      ""
+    );
+  } catch {
+    return "";
+  }
+};
+
+const normalizeHex = (hex: string) => {
+  if (!hex) return "#000000";
+  const trimmed = hex.trim();
+  return trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+};
+
+const getColorNameFromHex = (hex: string): string => {
+  const normalizedHex = normalizeHex(hex).toUpperCase();
+  return (
+    FALLBACK_COLOR_MAP[normalizedHex] ||
+    pickClosestName(normalizedHex) ||
+    normalizedHex
+  );
 };
 
 const SelectColorField: React.FC<Props> = ({
@@ -26,13 +80,17 @@ const SelectColorField: React.FC<Props> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [customHex, setCustomHex] = useState("#000000");
+  const [customName, setCustomName] = useState("");
   const [selectedColors, setSelectedColors] = useState<ColorItem[]>(selected || []); // ✅ single source of truth
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleAddHex = (hex: string) => {
+  // Color name mapping handled via color-namer with fallbacks
+
+  const handleAddHex = (hex: string, colorName?: string) => {
     if (editingIndex === null) return;
     const newColors = [...selectedColors];
-    newColors[editingIndex] = { name: hex, hex };
+    const name = colorName || customName.trim() || getColorNameFromHex(hex);
+    newColors[editingIndex] = { name, hex };
 
     setSelectedColors(newColors); // ✅ update state
     onChangeColors?.(newColors);  // notify parent
@@ -40,7 +98,12 @@ const SelectColorField: React.FC<Props> = ({
 
     setEditingIndex(null);
     setIsOpen(false);
+    setCustomName(""); // Reset custom name
   };
+
+  useEffect(() => {
+    setSelectedColors(Array.isArray(selected) ? [...selected] : []);
+  }, [selected]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -134,6 +197,7 @@ const SelectColorField: React.FC<Props> = ({
                 type="button"
                 onClick={() => handleAddHex(hex)}
                 className="relative w-[25px] h-[25px] md:w-[38px] md:h-[38px] flex items-center justify-center hover:scale-105 transition-transform"
+                title={getColorNameFromHex(hex)}
               >
                 <span className="absolute w-[25px] h-[25px] md:w-[38px] md:h-[38px] rounded-full border border-[#CECECE] bg-white" />
                 <span
@@ -145,27 +209,38 @@ const SelectColorField: React.FC<Props> = ({
           </div>
 
           {/* custom input */}
-          <div className="px-5 pb-4 flex items-center gap-2 md:gap-3">
-            <input
-              type="color"
-              value={customHex}
-              onChange={(e) => setCustomHex(e.target.value)}
-              className="w-8 h-8 md:w-10 md:h-10 border border-[#CECECE] rounded"
-            />
-            <input
-              type="text"
-              value={customHex}
-              onChange={(e) => setCustomHex(e.target.value)}
-              className="flex-1 h-8 md:h-10 px-2 md:px-3 rounded border border-[#E2E0E0] text-xs md:text-sm"
-              placeholder="#000000"
-            />
-            <button
-              type="button"
-              onClick={() => handleAddHex(customHex)}
-              className="px-2 md:px-3 h-8 md:h-10 rounded-[8px] border border-[#E2E0E0] text-xs md:text-sm font-medium hover:bg-gray-50"
-            >
-              {editingIndex !== null ? "Update" : "Add"}
-            </button>
+          <div className="px-5 pb-4 space-y-2">
+            <div className="flex items-center gap-2 md:gap-3">
+              <input
+                type="color"
+                value={customHex}
+                onChange={(e) => setCustomHex(e.target.value)}
+                className="w-8 h-8 md:w-10 md:h-10 border border-[#CECECE] rounded"
+              />
+              <input
+                type="text"
+                value={customHex}
+                onChange={(e) => setCustomHex(e.target.value)}
+                className="flex-1 h-8 md:h-10 px-2 md:px-3 rounded border border-[#E2E0E0] text-xs md:text-sm"
+                placeholder="#000000"
+              />
+            </div>
+            <div className="flex items-center gap-2 md:gap-3">
+              <input
+                type="text"
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+                className="flex-1 h-8 md:h-10 px-2 md:px-3 rounded border border-[#E2E0E0] text-xs md:text-sm"
+                placeholder="Color name (e.g., Red, Blue, Custom Blue)"
+              />
+              <button
+                type="button"
+                onClick={() => handleAddHex(customHex, customName.trim())}
+                className="px-2 md:px-3 h-8 md:h-10 rounded-[8px] border border-[#E2E0E0] text-xs md:text-sm font-medium hover:bg-gray-50"
+              >
+                {editingIndex !== null ? "Update" : "Add"}
+              </button>
+            </div>
           </div>
         </div>
       )}

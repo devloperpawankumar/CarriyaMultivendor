@@ -1,5 +1,13 @@
 import React from 'react';
 
+// Import admin icons
+import dashboardIcon from '../../assets/images/Admin/ad-dashbord.png';
+import usersIcon from '../../assets/images/Admin/ad-users.png';
+import sellersIcon from '../../assets/images/Admin/ad-seller.png';
+import buyerIcon from '../../assets/images/Admin/ad-buyer.png';
+import paymentsIcon from '../../assets/images/Admin/ad-paymets.png';
+import settingsIcon from '../../assets/images/Admin/ad-setting.png';
+
 type AdminSidebarProps = {
 	activeKey?: string;
 	onMenuClick?: (key: string) => void;
@@ -8,64 +16,100 @@ type AdminSidebarProps = {
     isMobile?: boolean;
 };
 
-const menuItems: Array<{ key: string; label: string }> = [
-    { key: 'new-sellers', label: 'New Sellers' },
-    { key: 'edit-content', label: 'Edit Content' },
-    { key: 'see-transaction', label: 'See Transaction' },
+type MenuItem = {
+    key: string;
+    label: string;
+    icon: string;
+    iconActive?: string;
+};
+
+const menuItems: MenuItem[] = [
+    { key: 'dashboard', label: 'Dashboard', icon: dashboardIcon },
+    { key: 'users', label: 'Users', icon: usersIcon },
+    { key: 'sellers', label: 'Sellers', icon: sellersIcon },
+    { key: 'orders', label: 'Orders', icon: buyerIcon },
+    { key: 'payments', label: 'Payments', icon: paymentsIcon },
+    { key: 'settings', label: 'Settings', icon: settingsIcon },
 ];
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeKey, onMenuClick, topLogoSrc, bottomLogoSrc, isMobile }) => {
     return (
-        <div className="flex flex-col justify-between" style={{ width: isMobile ? '100%' : 366, height: isMobile ? 'auto' : 932 }}>
-            {/* Top logo (hide on mobile overlay to avoid duplicate logo in header) */}
-            {isMobile ? null : (
-                <div style={{ paddingLeft: 33, paddingRight: 33, marginTop: 36 }}>
-                    {topLogoSrc && (
-                        <img src={topLogoSrc} alt="logo" style={{ width: 204, height: 65 }} />
-                    )}
+        <div 
+            className="flex flex-col bg-white border-r border-[#E5E7EB] shadow-sm" 
+            style={{ 
+                width: isMobile ? '100%' : 256, 
+                height: isMobile ? 'auto' : '100vh',
+                minHeight: isMobile ? 'auto' : 526
+            }}
+        >
+            {/* Top section with logo - Hidden on mobile since logo is in header */}
+            {!isMobile && (
+                <div 
+                    className="border-b border-[#E5E7EB] flex flex-col items-start pb-[0.909px] pt-[23.991px] px-[23.991px]"
+                    style={{ height: 105 }}
+                >
+                    <div className="flex items-center gap-2">
+                        {topLogoSrc && (
+                            <img 
+                                src={topLogoSrc} 
+                                alt="Carriya logo" 
+                                className="h-[31px] w-auto"
+                                style={{ maxWidth: 99 }}
+                            />
+                        )}
+                    </div>
+                    <div className="mt-2">
+                        <p className="font-bold text-[#101828] text-[24px] leading-[32px]" style={{ fontFamily: 'Arimo, sans-serif' }}>
+                            MarketAdmin
+                        </p>
+                    </div>
                 </div>
             )}
 
             {/* Menu area */}
-            <div className="flex-1" style={{ paddingLeft: 33, paddingRight: 33, marginTop: isMobile ? 24 : 41 }}>
+            <div 
+                className="flex-1 flex flex-col gap-1 pt-4 px-4"
+                style={{ paddingTop: 16, paddingLeft: 16, paddingRight: 16 }}
+            >
                 {menuItems.map((item) => {
                     const isActive = activeKey === item.key;
-                    const itemSpacing = 28; // 82 gap between rows minus 54 button height
                     return (
-                        <div key={item.key} style={{ marginBottom: itemSpacing }}>
-                            <button
-                                onClick={() => onMenuClick && onMenuClick(item.key)}
-                                className="block text-left"
-                                style={{
-                                    width: isMobile ? '100%' : 250,
-                                    height: isMobile ? 58 : 54,
-                                    borderRadius: 25,
-                                    paddingLeft: isMobile ? 24 : 30,
-                                    paddingRight: 16,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    backgroundColor: isActive ? 'rgba(46, 204, 113, 0.18)' : 'transparent',
-                                    border: isMobile ? '1px solid rgba(184,177,177,0.5)' : 'none',
-                                    boxShadow: isMobile ? '0 1px 2px rgba(0,0,0,0.04)' : 'none'
-                                }}
+                        <button
+                            key={item.key}
+                            onClick={() => onMenuClick && onMenuClick(item.key)}
+                            className={`flex items-center gap-3 h-12 px-4 rounded-[10px] transition-colors ${
+                                isActive ? 'bg-[#F0FDF4]' : 'bg-transparent hover:bg-gray-50'
+                            }`}
+                            style={{
+                                fontFamily: 'Arimo, sans-serif'
+                            }}
+                        >
+                            {/* Icon */}
+                            <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                                <img 
+                                    src={item.icon} 
+                                    alt={item.label}
+                                    className="w-5 h-5 object-contain transition-all duration-200"
+                                    style={{
+                                        opacity: isActive ? 1 : 0.6,
+                                        filter: isActive 
+                                            ? 'none' 
+                                            : 'brightness(0) saturate(100%) invert(22%) sepia(5%) saturate(1000%) hue-rotate(180deg) brightness(95%) contrast(85%)'
+                                    }}
+                                />
+                            </div>
+                            <span 
+                                className={`text-base leading-6 ${
+                                    isActive ? 'text-[#2ECC71]' : 'text-[#364153]'
+                                }`}
+                                style={{ fontFamily: 'Arimo, sans-serif' }}
                             >
-                                <span className="font-semibold" style={{ fontSize: isMobile ? 22 : 25, color: '#2ECC71', whiteSpace: 'nowrap' }}>{item.label}</span>
-                                <span className="font-semibold" style={{ fontSize: isMobile ? 22 : 25, color: '#2ECC71' }}>&gt;</span>
-                            </button>
-                        </div>
+                                {item.label}
+                            </span>
+                        </button>
                     );
                 })}
             </div>
-
-            {/* Bottom logo (hidden on mobile for a cleaner full-screen menu) */}
-            {isMobile ? null : (
-                <div style={{ paddingLeft: 33, paddingRight: 33, marginBottom: 124 }}>
-                    {bottomLogoSrc && (
-                        <img src={bottomLogoSrc} alt="logo" style={{ width: 204, height: 65 }} />
-                    )}
-                </div>
-            )}
         </div>
     );
 };

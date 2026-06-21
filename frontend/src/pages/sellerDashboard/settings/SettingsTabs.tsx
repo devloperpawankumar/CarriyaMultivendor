@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
-type TabKey = 'store' | 'documents' | 'notifications' | 'shipping';
+type TabKey = 'store' | 'personal' | 'notifications' | 'shipping';
 
 type SettingsTabsProps = {
   storeTab: React.ReactNode;
@@ -9,28 +10,61 @@ type SettingsTabsProps = {
   shippingTab: React.ReactNode;
 };
 
-const tabs: Array<{ key: TabKey; label: string }> = [
-  { key: 'store', label: 'Store Information' },
-  { key: 'documents', label: 'Personal Info' },
-  { key: 'notifications', label: 'Notifications' },
-  { key: 'shipping', label: 'Shipping Settings' },
+const tabs: Array<{ key: TabKey; label: string; urlKey: string }> = [
+  { key: 'store', label: 'Store Information', urlKey: 'store' },
+  { key: 'personal', label: 'Personal Info', urlKey: 'personal' },
+  { key: 'notifications', label: 'Notifications', urlKey: 'notifications' },
+  { key: 'shipping', label: 'Shipping Settings', urlKey: 'shipping' },
 ];
 
+// Map URL parameter to TabKey (for backward compatibility with 'documents')
+const urlToTabKey = (urlParam: string | undefined): TabKey => {
+  if (!urlParam) return 'store';
+  const tab = tabs.find(t => t.urlKey === urlParam);
+  if (tab) return tab.key;
+  // Legacy support: 'documents' maps to 'personal'
+  if (urlParam === 'documents') return 'personal';
+  return 'store'; // Default fallback
+};
+
 const SettingsTabs: React.FC<SettingsTabsProps> = ({ storeTab, documentsTab, notificationsTab, shippingTab }) => {
-  const [active, setActive] = useState<TabKey>('store');
+  const { tab: urlTab } = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // URL is the single source of truth - derive active tab from URL path
+  const active = urlToTabKey(urlTab);
+
+  // Redirect to default tab if no tab specified (only on mount or when on base /settings)
+  useEffect(() => {
+    // If we're on /seller/settings (no tab), redirect to /seller/settings/store
+    if (location.pathname === '/seller/settings' || !urlTab) {
+      navigate('/seller/settings/store', { replace: true });
+    }
+  }, [location.pathname, urlTab, navigate]);
+
+  // Handle tab change with URL update (path-based routing)
+  const handleTabChange = (tabKey: TabKey) => {
+    const tabConfig = tabs.find(t => t.key === tabKey);
+    if (tabConfig) {
+      navigate(`/seller/settings/${tabConfig.urlKey}`, { replace: true });
+      // Optional: Scroll to top when tab changes
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const renderContent = () => {
     switch (active) {
       case 'store':
         return storeTab;
-      case 'documents':
-        return documentsTab;
+      case 'personal':
+        return documentsTab; // Personal Info component
       case 'notifications':
         return notificationsTab;
       case 'shipping':
         return shippingTab;
       default:
-        return null;
+        return storeTab; // Default fallback
     }
   };
 
@@ -46,7 +80,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({ storeTab, documentsTab, not
               <select
                 id="settings-mobile-tab"
                 value={active}
-                onChange={(e) => setActive(e.target.value as TabKey)}
+                onChange={(e) => handleTabChange(e.target.value as TabKey)}
                 className="w-full appearance-none rounded-2xl border border-[#CDEFD9] bg-white pl-4 pr-14 py-3 text-[15px] font-semibold text-[#252C36] shadow-[0_0_0_3px_rgba(46,204,113,0.15)_inset] focus:outline-none focus:ring-2 focus:ring-[#2ECC71]/40 focus:border-[#2ECC71]"
                 aria-label="Settings Tabs Selector"
               >
@@ -73,7 +107,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({ storeTab, documentsTab, not
               {tabs.map(t => (
                 <button
                   key={t.key}
-                  onClick={() => setActive(t.key)}
+                  onClick={() => handleTabChange(t.key)}
                   role="tab"
                   aria-selected={active === t.key}
                   className={

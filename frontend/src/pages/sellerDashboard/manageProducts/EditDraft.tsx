@@ -2,203 +2,9 @@ import React from 'react';
 import SellerScaffold from '../../../components/seller/SellerScaffold';
 import { sellerMenuIcons, sellerMenuRoutes } from '../../../components/seller/menuConfig';
 import { useNavigate } from 'react-router-dom';
-import prod1 from '../../../assets/images/Product/prodcut1.png';
-import prod2 from '../../../assets/images/Product/product2.png';
-import banner from '../../../assets/images/pexels-pixabay-356056.jpg';
 import { fetchProducts, ProductListItem } from '../../../services/productService';
+import { buildProductPublicId } from './utils/productPublicId';
 
-// Extended type for draft products
-export type DraftProductListItem = {
-  id: string;
-  title: string;
-  price: number;
-  stock: number;
-  status: 'draft';
-  thumbnailUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-  category?: string;
-  description?: string;
-};
-
-// API function for fetching draft products
-export async function fetchDraftProducts(params: { page?: number; pageSize?: number } = {}): Promise<{
-  items: DraftProductListItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-}> {
-  const page = params.page ?? 1;
-  const pageSize = params.pageSize ?? 10;
-  const qs = new URLSearchParams({ 
-    page: String(page), 
-    pageSize: String(pageSize), 
-    status: 'draft' 
-  });
-
-  try {
-    const res = await fetch(`/api/seller/products/drafts?${qs.toString()}`);
-    if (!res.ok) {
-      throw new Error('Failed to fetch draft products');
-    }
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching draft products:', error);
-    // Return mock data for development
-    return {
-      items: [
-        {
-          id: '1',
-          title: 'Nokia 4G Mobile Phone - 64 GB',
-          price: 45000,
-          stock: 50,
-          status: 'draft',
-          thumbnailUrl: prod1,
-          createdAt: '2024-01-15T10:30:00Z',
-          updatedAt: '2024-01-20T14:45:00Z',
-          category: 'Electronics',
-          description: 'High-quality Nokia mobile phone with 4G connectivity'
-        },
-        {
-          id: '2',
-          title: 'Men\'s Casual Cotton Slim Fit Shirt – Blue Long Sleeve',
-          price: 1200,
-          stock: 1,
-          status: 'draft',
-          thumbnailUrl: banner,
-          createdAt: '2024-01-16T09:15:00Z',
-          updatedAt: '2024-01-21T11:20:00Z',
-          category: 'Clothing',
-          description: 'Comfortable cotton shirt perfect for casual wear'
-        },
-        {
-          id: '3',
-          title: 'Wireless Bluetooth Earphones with Mic – Deep Bass, Long Battery',
-          price: 2500,
-          stock: 100,
-          status: 'draft',
-          thumbnailUrl: prod2,
-          createdAt: '2024-01-17T16:45:00Z',
-          updatedAt: '2024-01-22T08:30:00Z',
-          category: 'Electronics',
-          description: 'Premium wireless earphones with excellent sound quality'
-        },
-        {
-          id: '4',
-          title: 'Comfortable Casual Rubber Slippers – Non Slip, Soft Everyday Wear',
-          price: 300,
-          stock: 500,
-          status: 'draft',
-          thumbnailUrl: prod1,
-          createdAt: '2024-01-18T13:20:00Z',
-          updatedAt: '2024-01-23T15:10:00Z',
-          category: 'Footwear',
-          description: 'Comfortable rubber slippers for everyday use'
-        },
-        {
-          id: '5',
-          title: 'Apple MacBook Air M2 13"',
-          price: 199999,
-          stock: 12,
-          status: 'draft',
-          thumbnailUrl: prod2,
-          createdAt: '2024-01-19T14:30:00Z',
-          updatedAt: '2024-01-24T10:15:00Z',
-          category: 'Electronics',
-          description: 'Latest Apple MacBook Air with M2 chip'
-        },
-        {
-          id: '6',
-          title: 'Samsung Galaxy A34 5G – 128 GB',
-          price: 79999,
-          stock: 0,
-          status: 'draft',
-          thumbnailUrl: banner,
-          createdAt: '2024-01-20T11:45:00Z',
-          updatedAt: '2024-01-25T16:20:00Z',
-          category: 'Electronics',
-          description: 'Samsung Galaxy A34 with 5G connectivity'
-        },
-        {
-          id: '7',
-          title: 'Sony WH-CH520 Wireless Headphones',
-          price: 17500,
-          stock: 43,
-          status: 'draft',
-          thumbnailUrl: prod1,
-          createdAt: '2024-01-21T09:30:00Z',
-          updatedAt: '2024-01-26T12:45:00Z',
-          category: 'Electronics',
-          description: 'High-quality wireless headphones from Sony'
-        },
-        {
-          id: '8',
-          title: 'HP Pavilion 15 – Core i5 12th Gen',
-          price: 165000,
-          stock: 7,
-          status: 'draft',
-          thumbnailUrl: prod2,
-          createdAt: '2024-01-22T15:20:00Z',
-          updatedAt: '2024-01-27T09:30:00Z',
-          category: 'Electronics',
-          description: 'HP Pavilion laptop with Intel Core i5 12th generation'
-        },
-        {
-          id: '9',
-          title: 'Anker 20W Fast Charger USB-C',
-          price: 3200,
-          stock: 150,
-          status: 'draft',
-          thumbnailUrl: prod1,
-          createdAt: '2024-01-23T13:15:00Z',
-          updatedAt: '2024-01-28T14:20:00Z',
-          category: 'Electronics',
-          description: 'Fast charging USB-C adapter from Anker'
-        },
-        {
-          id: '10',
-          title: 'Nike Revolution 6 Men\'s Running Shoes',
-          price: 11500,
-          stock: 3,
-          status: 'draft',
-          thumbnailUrl: banner,
-          createdAt: '2024-01-24T10:45:00Z',
-          updatedAt: '2024-01-29T11:30:00Z',
-          category: 'Footwear',
-          description: 'Comfortable running shoes from Nike'
-        },
-        {
-          id: '11',
-          title: 'Logitech M331 Silent Plus Mouse',
-          price: 3999,
-          stock: 98,
-          status: 'draft',
-          thumbnailUrl: prod2,
-          createdAt: '2024-01-25T16:30:00Z',
-          updatedAt: '2024-01-30T08:15:00Z',
-          category: 'Electronics',
-          description: 'Silent wireless mouse from Logitech'
-        },
-        {
-          id: '12',
-          title: 'Xiaomi Redmi Buds 4 Lite',
-          price: 5500,
-          stock: 24,
-          status: 'draft',
-          thumbnailUrl: prod1,
-          createdAt: '2024-01-26T12:20:00Z',
-          updatedAt: '2024-01-31T15:45:00Z',
-          category: 'Electronics',
-          description: 'Wireless earbuds from Xiaomi'
-        }
-      ],
-      total: 12,
-      page: 1,
-      pageSize: 10
-    };
-  }
-}
 
 const EditDraft: React.FC = () => {
   const navigate = useNavigate();
@@ -221,7 +27,7 @@ const EditDraft: React.FC = () => {
   const EditButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
     const base = 'inline-flex items-center justify-center rounded-[10px] h-10 w-[119px] text-[18px] font-semibold bg-[#CC9501] text-white';
     return (
-      <button onClick={()=>navigate(`/seller/manage-products/add-product`)} className={base}>
+      <button onClick={onClick} className={base}>
         Edit
       </button>
     );
@@ -230,7 +36,7 @@ const EditDraft: React.FC = () => {
   const MobileEditButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
     const base = 'inline-flex items-center justify-center rounded-[5px] h-[23px] w-[75px] text-[10px] font-semibold bg-[#CC9501] text-white';
     return (
-      <button onClick={()=>navigate(`/seller/manage-products/add-product`)} className={base}>
+      <button onClick={onClick} className={base}>
         Edit
       </button>
     );
@@ -293,56 +99,105 @@ const EditDraft: React.FC = () => {
   const [page, setPage] = React.useState(1);
   const [pageSize] = React.useState(4);
   const [total, setTotal] = React.useState(0);
-  const [items, setItems] = React.useState<DraftProductListItem[]>([]);
+  const [items, setItems] = React.useState<ProductListItem[]>([]);
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [retryCount, setRetryCount] = React.useState(0);
+  const [refreshKey, setRefreshKey] = React.useState(0);
 
-  // Load draft products from backend with graceful fallback
+  const withPublicIds = React.useCallback(
+    (list: ProductListItem[]) =>
+      (list || []).map((item) => ({
+        ...item,
+        publicId: item.publicId || buildProductPublicId(item.title, item.id),
+      })),
+    []
+  );
+
+  // Load draft products from backend with professional practices
   React.useEffect(() => {
+    const abortController = new AbortController();
     let isMounted = true;
-    setLoading(true);
-    fetchDraftProducts({ page, pageSize })
-      .then((res: { items: DraftProductListItem[]; total: number }) => {
-        if (!isMounted) return;
-        setItems(res.items);
-        setTotal(res.total);
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        // Fallback demo rows to preserve UI while backend is wiring up
-        const demo: DraftProductListItem[] = [
-          { id: '1', title: 'Nokia 4G Mobile Phone - 64 GB', price: 45000, stock: 50, status: 'draft', thumbnailUrl: prod1, createdAt: '2024-01-15T10:30:00Z', updatedAt: '2024-01-20T14:45:00Z', category: 'Electronics', description: 'High-quality Nokia mobile phone with 4G connectivity' },
-          { id: '2', title: 'Men\'s Casual Cotton Slim Fit Shirt – Blue Long Sleeve', price: 1200, stock: 1, status: 'draft', thumbnailUrl: banner, createdAt: '2024-01-16T09:15:00Z', updatedAt: '2024-01-21T11:20:00Z', category: 'Clothing', description: 'Comfortable cotton shirt perfect for casual wear' },
-          { id: '3', title: 'Wireless Bluetooth Earphones with Mic – Deep Bass, Long Battery', price: 2500, stock: 100, status: 'draft', thumbnailUrl: prod2, createdAt: '2024-01-17T16:45:00Z', updatedAt: '2024-01-22T08:30:00Z', category: 'Electronics', description: 'Premium wireless earphones with excellent sound quality' },
-          { id: '4', title: 'Comfortable Casual Rubber Slippers – Non Slip, Soft Everyday Wear', price: 300, stock: 500, status: 'draft', thumbnailUrl: prod1, createdAt: '2024-01-18T13:20:00Z', updatedAt: '2024-01-23T15:10:00Z', category: 'Footwear', description: 'Comfortable rubber slippers for everyday use' },
-          { id: '5', title: 'Apple MacBook Air M2 13"', price: 199999, stock: 12, status: 'draft', thumbnailUrl: prod2, createdAt: '2024-01-19T14:30:00Z', updatedAt: '2024-01-24T10:15:00Z', category: 'Electronics', description: 'Latest Apple MacBook Air with M2 chip' },
-          { id: '6', title: 'Samsung Galaxy A34 5G – 128 GB', price: 79999, stock: 0, status: 'draft', thumbnailUrl: banner, createdAt: '2024-01-20T11:45:00Z', updatedAt: '2024-01-25T16:20:00Z', category: 'Electronics', description: 'Samsung Galaxy A34 with 5G connectivity' },
-          { id: '7', title: 'Sony WH-CH520 Wireless Headphones', price: 17500, stock: 43, status: 'draft', thumbnailUrl: prod1, createdAt: '2024-01-21T09:30:00Z', updatedAt: '2024-01-26T12:45:00Z', category: 'Electronics', description: 'High-quality wireless headphones from Sony' },
-          { id: '8', title: 'HP Pavilion 15 – Core i5 12th Gen', price: 165000, stock: 7, status: 'draft', thumbnailUrl: prod2, createdAt: '2024-01-22T15:20:00Z', updatedAt: '2024-01-27T09:30:00Z', category: 'Electronics', description: 'HP Pavilion laptop with Intel Core i5 12th generation' },
-          { id: '9', title: 'Anker 20W Fast Charger USB-C', price: 3200, stock: 150, status: 'draft', thumbnailUrl: prod1, createdAt: '2024-01-23T13:15:00Z', updatedAt: '2024-01-28T14:20:00Z', category: 'Electronics', description: 'Fast charging USB-C adapter from Anker' },
-          { id: '10', title: 'Nike Revolution 6 Men\'s Running Shoes', price: 11500, stock: 3, status: 'draft', thumbnailUrl: banner, createdAt: '2024-01-24T10:45:00Z', updatedAt: '2024-01-29T11:30:00Z', category: 'Footwear', description: 'Comfortable running shoes from Nike' },
-          { id: '11', title: 'Logitech M331 Silent Plus Mouse', price: 3999, stock: 98, status: 'draft', thumbnailUrl: prod2, createdAt: '2024-01-25T16:30:00Z', updatedAt: '2024-01-30T08:15:00Z', category: 'Electronics', description: 'Silent wireless mouse from Logitech' },
-          { id: '12', title: 'Xiaomi Redmi Buds 4 Lite', price: 5500, stock: 24, status: 'draft', thumbnailUrl: prod1, createdAt: '2024-01-26T12:20:00Z', updatedAt: '2024-01-31T15:45:00Z', category: 'Electronics', description: 'Wireless earbuds from Xiaomi' },
-        ];
-        setItems(demo);
-        setTotal(demo.length);
-      })
-      .finally(() => setLoading(false));
+    let retryTimeout: NodeJS.Timeout | null = null;
+
+    const loadProducts = async (attempt = 0) => {
+      if (!isMounted || abortController.signal.aborted) return;
+
+      setLoading(true);
+      setError(null);
+      
+      // Clear items only on initial load (not retries) to show skeleton
+      if (attempt === 0) {
+        setItems([]);
+      }
+
+      try {
+        const res = await fetchProducts({ page, pageSize, status: 'draft' });
+        
+        if (abortController.signal.aborted || !isMounted) return;
+
+        setItems(withPublicIds(res.items || []));
+        setTotal(res.total || 0);
+        setError(null);
+        setRetryCount(0);
+      } catch (err: any) {
+        if (abortController.signal.aborted || !isMounted) return;
+
+        const message = err?.response?.data?.message || err?.message || 'Unable to load draft products.';
+        
+        // Retry logic: up to 2 retries with exponential backoff
+        if (attempt < 2 && !abortController.signal.aborted) {
+          const delay = Math.min(1000 * Math.pow(2, attempt), 4000);
+          retryTimeout = setTimeout(() => {
+            if (isMounted && !abortController.signal.aborted) {
+              loadProducts(attempt + 1);
+            }
+          }, delay);
+          setRetryCount(attempt + 1);
+        } else {
+          setError(message);
+          setItems([]);
+          setTotal(0);
+        }
+      } finally {
+        if (isMounted && !abortController.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadProducts();
+
     return () => {
       isMounted = false;
+      abortController.abort();
+      if (retryTimeout) clearTimeout(retryTimeout);
     };
-  }, [page, pageSize]);
+  }, [page, pageSize, refreshKey, withPublicIds]);
 
   // On page change, scroll to very top to show full page
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page]);
 
-  const totalPages = React.useMemo(() => Math.max(1, Math.ceil((total || 120) / pageSize)), [total, pageSize]);
-  const pageNumbers = React.useMemo(() => [1, 2, 3].filter((n) => n <= totalPages), [totalPages]);
+  const totalPages = React.useMemo(() => Math.max(1, Math.ceil((total || 0) / pageSize)), [total, pageSize]);
+  const pageNumbers = React.useMemo(() => {
+    const pages = new Set<number>();
+    pages.add(1);
+    pages.add(totalPages);
+    for (let i = Math.max(1, page - 1); i <= Math.min(totalPages, page + 1); i++) {
+      pages.add(i);
+    }
+    return Array.from(pages).sort((a, b) => a - b);
+  }, [page, totalPages]);
 
-  const handleEditProduct = (productId: string) => {
-    // Navigate to edit product page
-    navigate(`/seller/manage-products/edit-product/${productId}`);
+  const formatPrice = React.useCallback((value: number) => {
+    return Intl.NumberFormat('en-PK', { maximumFractionDigits: 0 }).format(value || 0);
+  }, []);
+
+  const handleEditProduct = (product: ProductListItem) => {
+    const publicId = product.publicId || buildProductPublicId(product.title, product.id);
+    navigate(`/seller/manage-products/edit/${encodeURIComponent(publicId)}`);
   };
 
   const handleAddProduct = () => {
@@ -373,50 +228,85 @@ const EditDraft: React.FC = () => {
         </div>
 
         <div ref={containerRef} className="bg-white rounded-[10px] md:rounded-[15px] py-1 border border-[#C1C1C1] overflow-hidden">
+          {error && !loading && (
+            <div className="px-6 py-4 flex items-center justify-between bg-red-50 border-b border-red-200">
+              <span className="text-red-600 text-sm md:text-base">{error}</span>
+              <button
+                onClick={() => {
+                  setError(null);
+                  setRetryCount(0);
+                  setRefreshKey((k) => k + 1);
+                }}
+                className="ml-4 px-3 py-1 text-xs md:text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          {retryCount > 0 && loading && (
+            <div className="px-6 py-2 text-xs md:text-sm text-[#4C4C4C] bg-yellow-50 border-b border-yellow-200">
+              Retrying... (Attempt {retryCount + 1}/3)
+            </div>
+          )}
           {isMobile ? (
             // Mobile Table View
             <>
               {/* Mobile Table Header */}
-              <div className="grid grid-cols-[75px_1fr_40px_80px] items-center px-3 h-[35px] py-2 border-b border-[#C1C1C1]">
+              <div className="grid grid-cols-[75px_1fr_60px_80px] items-center px-3 h-[35px] py-2 border-b border-[#C1C1C1]">
                 <div className="text-[10px] font-semibold text-black">Product Image</div>
                 <div className="text-[10px] font-semibold text-black pl-2">Product Title</div>
-                <div className="text-[10px] font-semibold text-black text-center">Stock</div>
-                <div className="text-[10px] font-semibold text-black text-center">Edit Draft</div>
+                <div className="text-[10px] font-semibold text-black text-center">Price</div>
+                <div className="text-[10px] font-semibold text-black text-center">Edit</div>
               </div>
 
               {loading && Array.from({ length: pageSize }).map((_, idx) => (
-                <div key={`skeleton-${idx}`} className="grid grid-cols-[75px_1fr_40px_80px] items-center px-3 py-3 border-b last:border-b-0 border-[#C1C1C1]">
-                  <div className="w-[67px] h-[61px] rounded-[10px] border border-[#B8B1B1] bg-[rgba(46,204,113,0.28)] flex items-center justify-center overflow-hidden">
-                    <div className="w-[33px] h-[33px] bg-gray-200 rounded-[6px] animate-pulse"></div>
+                <div key={`skeleton-${idx}`} className="grid grid-cols-[75px_1fr_60px_80px] items-center px-3 py-5 border-b last:border-b-0 border-[#C1C1C1]">
+                  {/* Skeleton Image */}
+                  <div className="w-[67px] h-[61px] rounded-[10px] border border-[#B8B1B1] bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <div className="w-[33px] h-[33px] bg-gray-300 rounded-[6px] animate-pulse"></div>
                   </div>
-                  <div className="text-[10px] font-medium text-black pr-2 pl-2 break-words min-w-0">
-                    <div className="line-clamp-2 leading-tight">Loading product title...</div>
+                  {/* Skeleton Title */}
+                  <div className="pr-2 pl-2 break-words min-w-0">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse mb-1 w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
                   </div>
-                  <div className="text-[10px] font-medium text-black text-center">-</div>
+                  {/* Skeleton Price */}
+                  <div className="text-center">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-16 mx-auto"></div>
+                  </div>
+                  {/* Skeleton Edit Button */}
                   <div className="flex justify-center">
                     <div className="w-[75px] h-[23px] bg-gray-200 rounded-[5px] animate-pulse"></div>
                   </div>
                 </div>
               ))}
 
-              {!loading && items.slice((page - 1) * pageSize, page * pageSize).map((item: DraftProductListItem) => {
-                const thumb = item.thumbnailUrl || prod1;
+              {!loading && items.length === 0 && !error && (
+                <div className="px-3 py-6 text-center text-[10px] text-[#4C4C4C]">No draft products found.</div>
+              )}
+              {!loading && items.map((item: ProductListItem) => {
+                const hasImage = item.thumbnailUrl && item.thumbnailUrl.trim() !== '';
                 return (
-                  <div key={item.id} className="grid grid-cols-[75px_1fr_40px_80px] items-center px-3 py-5 border-b last:border-b-0 border-[#C1C1C1]">
+                  <div key={item.id} className="grid grid-cols-[75px_1fr_60px_80px] items-center px-3 py-5 border-b last:border-b-0 border-[#C1C1C1]">
                     <div className="w-[67px] h-[61px] rounded-[10px] border border-[#B8B1B1] bg-[rgba(46,204,113,0.28)] flex items-center justify-center overflow-hidden">
-                      <img src={thumb} alt="product" className="w-[33px] h-[33px] object-cover rounded-[6px]" />
+                      {hasImage ? (
+                        <img src={item.thumbnailUrl} alt="product" className="w-[33px] h-[33px] object-cover rounded-[6px]" />
+                      ) : (
+                        <div className="w-[33px] h-[33px] rounded-[6px] bg-gray-200 flex items-center justify-center">
+                          <span className="text-[8px] text-gray-400 text-center leading-tight">No Image</span>
+                        </div>
+                      )}
                     </div>
-                    {/* Product Title - Improved for long text */}
-                    <div className="text-[10px] font-medium text-black pr-2 pl-2 py-5 break-words whitespace-normal min-w-0">
+                    <div className="text-[10px] font-medium text-black pr-2 pl-2 break-words whitespace-normal min-w-0">
                       <div className="leading-tight" title={item.title}>
                         {item.title}
                       </div>
                     </div>
-                    <div className="text-[10px] font-medium text-black text-center">
-                      {item.stock}
+                    <div className="text-[10px] font-semibold text-black text-center">
+                      {formatPrice(item.finalPrice ?? item.currentPrice ?? item.price)}
                     </div>
                     <div className="flex justify-center">
-                      <MobileEditButton onClick={() => handleEditProduct(item.id)} />
+                      <MobileEditButton onClick={() => handleEditProduct(item)} />
                     </div>
                   </div>
                 );
@@ -425,7 +315,7 @@ const EditDraft: React.FC = () => {
               {/* Mobile Pagination */}
               <div className="flex flex-col items-center gap-1 px-3 py-2">
                 <div className="text-[10px] text-black text-center">
-                  {`Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, total || page * pageSize)} of ${total || 120} Products`}
+                  {`Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, total || page * pageSize)} of ${total || 0} Products`}
                 </div>
                 <div className="flex items-center gap-2 text-[#4C4C4C] text-[10px]">
                   <button
@@ -471,29 +361,61 @@ const EditDraft: React.FC = () => {
 
                 {loading && Array.from({ length: pageSize }).map((_, idx) => (
                   <div key={`skeleton-${idx}`} className="grid grid-cols-[160px_1fr_140px_120px_140px] items-center px-6 py-6 border-b last:border-b-0 border-[#C1C1C1]">
-                    <div className="w-[123px] h-[113px] rounded-[10px] border border-[#B8B1B1] bg-[rgba(46,204,113,0.28)] flex items-center justify-center overflow-hidden">
-                      <img src={prod1} alt="product" className="w-[82px] h-[82px] object-cover rounded-[10px]" />
+                    {/* Skeleton Image */}
+                    <div className="w-[123px] h-[113px] rounded-[10px] border border-[#B8B1B1] bg-gray-100 flex items-center justify-center overflow-hidden">
+                      <div className="w-[82px] h-[82px] bg-gray-300 rounded-[10px] animate-pulse"></div>
                     </div>
-                    <div className="text-[18px] md:text-[20px] font-medium text-black pr-4 pl-6">Loading…</div>
-                    <div className="text-[18px] md:text-[22px] font-medium text-black pl-6">-</div>
-                    <div className="text-[18px] md:text-[22px] font-medium text-black pl-6">-</div>
+                    {/* Skeleton Title */}
+                    <div className="pr-4 pl-6">
+                      <div className="h-5 bg-gray-200 rounded animate-pulse mb-2 w-3/4"></div>
+                      <div className="h-5 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                    </div>
+                    {/* Skeleton Price */}
                     <div className="pl-6">
-                      <EditButton onClick={() => {}} />
+                      <div className="h-6 bg-gray-200 rounded animate-pulse w-24"></div>
+                    </div>
+                    {/* Skeleton Stock */}
+                    <div className="pl-6">
+                      <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
+                    </div>
+                    {/* Skeleton Edit Button */}
+                    <div className="pl-6">
+                      <div className="w-[119px] h-10 bg-gray-200 rounded-[10px] animate-pulse"></div>
                     </div>
                   </div>
                 ))}
-                {!loading && items.slice((page - 1) * pageSize, page * pageSize).map((item: DraftProductListItem) => {
-                  const thumb = item.thumbnailUrl || prod1;
+                {!loading && items.length === 0 && !error && (
+                  <div className="px-6 py-10 text-center text-[#4C4C4C] text-[16px]">You don't have any draft products yet.</div>
+                )}
+                {!loading && items.map((item: ProductListItem) => {
+                  const hasImage = item.thumbnailUrl && item.thumbnailUrl.trim() !== '';
+                  const finalPrice = item.finalPrice ?? item.currentPrice ?? item.price;
+                  const hasDiscount = item.discount > 0 && finalPrice !== item.price;
                   return (
                     <div key={item.id} className="grid grid-cols-[160px_1fr_140px_120px_140px] items-center px-6 py-6 border-b last:border-b-0 border-[#C1C1C1]">
                       <div className="w-[123px] h-[113px] rounded-[10px] border border-[#B8B1B1] bg-[rgba(46,204,113,0.28)] flex items-center justify-center overflow-hidden">
-                        <img src={thumb} alt="product" className="w-[82px] h-[82px] object-cover rounded-[10px]" />
+                        {hasImage ? (
+                          <img src={item.thumbnailUrl} alt="product" className="w-[82px] h-[82px] object-cover rounded-[10px]" />
+                        ) : (
+                          <div className="w-[82px] h-[82px] rounded-[10px] bg-gray-200 flex items-center justify-center">
+                            <span className="text-[12px] text-gray-400 text-center leading-tight">No Image</span>
+                          </div>
+                        )}
                       </div>
-                      <div className="text-[18px] md:text-[20px] font-medium text-black pr-4 pl-6">{item.title}</div>
-                      <div className="text-[18px] md:text-[22px] font-medium text-black pl-6">{Intl.NumberFormat('en-PK').format(item.price)}</div>
-                      <div className="text-[18px] md:text-[22px] font-medium text-black pl-6">{item.stock}</div>
+                      <div className="text-[18px] md:text-[20px] font-medium text-black pr-4 pl-6" title={item.title}>{item.title}</div>
                       <div className="pl-6">
-                        <EditButton onClick={() => handleEditProduct(item.id)} />
+                        <div className="flex flex-col">
+                          <span className="text-[18px] md:text-[22px] font-medium text-black">{formatPrice(finalPrice)}</span>
+                          {hasDiscount && (
+                            <span className="text-[14px] md:text-[16px] text-[#949494] line-through">{formatPrice(item.price)}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-[18px] md:text-[22px] font-medium text-black pl-6">
+                        {item.unlimitedStock ? 'Unlimited' : item.stock}
+                      </div>
+                      <div className="pl-6">
+                        <EditButton onClick={() => handleEditProduct(item)} />
                       </div>
                     </div>
                   );
@@ -512,7 +434,7 @@ const EditDraft: React.FC = () => {
           {/* Desktop Pagination - Only show on desktop */}
           {!isMobile && (
             <div className="relative px-6 py-4">
-              <div className="text-[16px] md:text-[18px] text-black">{`Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, total || page * pageSize)} of ${total || 120} Products`}</div>
+              <div className="text-[16px] md:text-[18px] text-black">{`Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, total || page * pageSize)} of ${total || 0} Products`}</div>
               <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-4 text-[#4C4C4C] text-[16px] md:text-[18px]">
                 <button aria-label="Previous" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="text-[#2ECC71] text-[22px] disabled:opacity-40">{'<'}</button>
                 {pageNumbers.map((n) => (

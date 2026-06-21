@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { sellerMenuIcons, sellerMenuRoutes } from './menuConfig';
+import SellerNotificationBadge from './SellerNotificationBadge';
 
 const MobileSellerHeader: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,11 +35,19 @@ const MobileSellerHeader: React.FC = () => {
           className="h-[29px] w-auto rounded-lg"
         />
         <div className="flex items-center gap-3">
-          <img
-            src={require("../../assets/images/Seller/rightTop.png")}
-            alt="right-top"
-            className="w-5 h-5"
-          />
+          {/* Mobile notifications icon – tap to open notifications page */}
+          <button
+            type="button"
+            onClick={() => navigate('/seller/notifications')}
+            className="relative inline-flex items-center justify-center"
+          >
+            <img
+              src={require("../../assets/images/Seller/rightTop.png")}
+              alt="notifications"
+              className="w-5 h-5"
+            />
+            <SellerNotificationBadge className="absolute -top-1 -right-1" />
+          </button>
           <img
             src={require("../../assets/images/Seller/rightBottom.png")}
             alt="right-bottom"

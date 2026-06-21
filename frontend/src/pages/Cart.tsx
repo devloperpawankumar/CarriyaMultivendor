@@ -8,13 +8,49 @@ import CartItemRow from '../components/cart/CartItemRow';
 import OrderSummary from '../components/cart/OrderSummary';
 import { useCart } from '../contexts/CartContext';
 import { useClickOutside } from '../hooks/useClickOutside';
+import { useToast } from '../contexts/ToastContext';
 
 const Cart: React.FC = () => {
   const { items, totals, updateQuantity, removeItem, clearCart } = useCart();
+  const { showToast } = useToast();
   const [showCategories, setShowCategories] = useState(false);
   const browseButtonRef = useRef<HTMLButtonElement | null>(null);
   const categoriesDropdownRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+
+  // Error handler for cart operations (Amazon/Daraz style - stock issues are warnings, not errors)
+  const handleCartError = (error: any) => {
+    const backendMessage = error?.response?.data?.error || 
+                          error?.response?.data?.message || 
+                          error?.message || 
+                          'Operation failed. Please try again.';
+    const lowerMessage = backendMessage.toLowerCase();
+    
+    // Stock-related issues should be warnings (informational), not errors
+    if (lowerMessage.includes('insufficient stock') || 
+        lowerMessage.includes('stock') || 
+        lowerMessage.includes('available')) {
+      showToast({ 
+        type: 'warning', 
+        title: 'Stock Limit', 
+        message: backendMessage 
+      });
+    } else if (lowerMessage.includes('not available') || 
+               lowerMessage.includes('unavailable')) {
+      showToast({ 
+        type: 'warning', 
+        title: 'Product Unavailable', 
+        message: backendMessage 
+      });
+    } else {
+      // Real errors (network issues, server errors, etc.)
+      showToast({ 
+        type: 'error', 
+        title: 'Error', 
+        message: backendMessage 
+      });
+    }
+  };
 
   useClickOutside(() => setShowCategories(false), {
     enabled: showCategories,
@@ -53,7 +89,7 @@ const Cart: React.FC = () => {
             onSelectAll={() => {
               // Example: no-op now; integrate with selection state later
             }}
-            onDeleteAll={() => clearCart()}
+            onDeleteAll={() => clearCart().catch(handleCartError)}
           />
 
           {/* Cart Items */}
@@ -69,10 +105,10 @@ const Cart: React.FC = () => {
                 color={it.color}
                 size={it.size}
                 qty={it.qty}
-                shopName={it.shopName || "My Shop"}
-                onIncrease={(id) => updateQuantity(id, it.qty + 1)}
-                onDecrease={(id) => updateQuantity(id, it.qty - 1)}
-                onRemove={removeItem}
+                shopName={it.shopName || "Store"}
+                onIncrease={(id) => updateQuantity(id, it.qty + 1).catch(handleCartError)}
+                onDecrease={(id) => updateQuantity(id, it.qty - 1).catch(handleCartError)}
+                onRemove={(id) => removeItem(id).catch(handleCartError)}
               />
             ))}
           </div>
@@ -95,7 +131,7 @@ const Cart: React.FC = () => {
             onSelectAll={() => {
               // Example: no-op now; integrate with selection state later
             }}
-            onDeleteAll={() => clearCart()}
+            onDeleteAll={() => clearCart().catch(handleCartError)}
           />
 
           <div className="flex flex-col lg:flex-row gap-6">
@@ -112,10 +148,10 @@ const Cart: React.FC = () => {
                   color={it.color}
                   size={it.size}
                   qty={it.qty}
-                  shopName={it.shopName || "My Shop"}
-                  onIncrease={(id) => updateQuantity(id, it.qty + 1)}
-                  onDecrease={(id) => updateQuantity(id, it.qty - 1)}
-                  onRemove={removeItem}
+                  shopName={it.shopName || "Store"}
+                  onIncrease={(id) => updateQuantity(id, it.qty + 1).catch(handleCartError)}
+                  onDecrease={(id) => updateQuantity(id, it.qty - 1).catch(handleCartError)}
+                  onRemove={(id) => removeItem(id).catch(handleCartError)}
                 />
               ))}
             </div>

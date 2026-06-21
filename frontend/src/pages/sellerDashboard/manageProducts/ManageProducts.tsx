@@ -3,6 +3,7 @@ import ProductStatCard from '../../../components/seller/ProductStatCard';
 import SellerScaffold from '../../../components/seller/SellerScaffold';
 import { sellerMenuIcons, sellerMenuRoutes } from '../../../components/seller/menuConfig';
 import { useNavigate } from 'react-router-dom';
+import { fetchProducts } from '../../../services/productService';
 
 // ✅ Replace these paths with your actual icons
 import addIcon from '../../../assets/images/Seller/Add product.png';
@@ -13,6 +14,40 @@ import lowStockIcon from '../../../assets/images/Seller/lowStcokk.png';
 
 const ManageProducts: React.FC = () => {
   const navigate = useNavigate();
+  const [lowStockCount, setLowStockCount] = React.useState<number | null>(null);
+  const [loadingLowStock, setLoadingLowStock] = React.useState(true);
+
+  // Fetch low stock count on component mount
+  React.useEffect(() => {
+    let isMounted = true;
+    const abortController = new AbortController();
+
+    const loadLowStockCount = async () => {
+      try {
+        // Fetch with minimal pageSize just to get the total count
+        const res = await fetchProducts({ page: 1, pageSize: 1, status: 'low_stock' });
+        if (isMounted && !abortController.signal.aborted) {
+          setLowStockCount(res.total || 0);
+        }
+      } catch (err) {
+        console.error('Failed to fetch low stock count:', err);
+        if (isMounted && !abortController.signal.aborted) {
+          setLowStockCount(0);
+        }
+      } finally {
+        if (isMounted && !abortController.signal.aborted) {
+          setLoadingLowStock(false);
+        }
+      }
+    };
+
+    loadLowStockCount();
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
+  }, []);
   return (
     <SellerScaffold menuIcons={sellerMenuIcons} menuRoutes={sellerMenuRoutes}>
       {/* Mobile responsive work: ensure heading is left-aligned */}
@@ -61,7 +96,13 @@ const ManageProducts: React.FC = () => {
           title="Low Stock"
           icon={<img src={lowStockIcon} alt="low stock" className="w-[34px] h-[34px] md:w-[74px] md:h-[74px]" />}
           buttonText="Low Stock"
-          subtitle="3 Products Need To Restore"
+          subtitle={
+            loadingLowStock
+              ? 'Loading...'
+              : lowStockCount !== null && lowStockCount > 0
+              ? `${lowStockCount} Product${lowStockCount === 1 ? '' : 's'} Need${lowStockCount === 1 ? 's' : ''} To Restore`
+              : 'No Products Need To Restore'
+          }
           onClick={() => navigate('/seller/manage-products/low-stock')}
         />
       </div>

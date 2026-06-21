@@ -38,12 +38,12 @@ const SellerLayoutWithSidebars: React.FC<SellerLayoutWithSidebarsProps> = ({
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex flex-col items-center gap-6 pt-6 pb-10 md:pt-10 px-8">
+        <main className="flex flex-col items-center gap-6 pt-6 pb-10 md:pt-10 px-4 md:px-8">
           {children}
         </main>
 
         {/* Right Mini Sidebar */}
-        <aside className="bg-white overflow-hidden hidden lg:block">
+        <aside className="bg-white hidden lg:block relative overflow-visible">
           <RightMiniBar 
             topIconSrc={topIconSrc} 
             bottomIconSrc={bottomIconSrc} 

@@ -5,17 +5,21 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { FavoritesProvider } from './contexts/FavoritesContext';
+import { Provider } from 'react-redux';
+import { store } from './store';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <FavoritesProvider>
-        <App />
-      </FavoritesProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <FavoritesProvider>
+          <App />
+        </FavoritesProvider>
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>
 );
 

@@ -1,28 +1,62 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SignupLayout from '../components/auth/SignupLayout';
 import FormField from '../components/auth/FormField';
 import ActionButton from '../components/auth/ActionButton';
 import sellerAddressImage from '../assets/images/auth/Rectangle 114 (2).png';
+import { pkProvinceDistricts } from '../data/pkRegions';
+import { submitAddress, getOnboardingStatus } from '../services/onboardingService';
 
 interface AddressFormData {
   pickupAddress: string;
-  region: string;
+  pickupProvince: string;
+  pickupDistrict: string;
   sameAsPickup: boolean;
   returnAddress: string;
-  returnRegion: string;
+  returnProvince: string;
+  returnDistrict: string;
 }
 
 const SellerAddressSetup: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof AddressFormData, string>>>({});
   const [formData, setFormData] = useState<AddressFormData>({
     pickupAddress: '',
-    region: '',
+    pickupProvince: '',
+    pickupDistrict: '',
     sameAsPickup: false,
     returnAddress: '',
-    returnRegion: '',
+    returnProvince: '',
+    returnDistrict: '',
   });
+
+  const provinces = useMemo(() => Object.keys(pkProvinceDistricts), []);
+  // Prevent duplicate flow if already completed
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const userId = localStorage.getItem('onboardingUserId') || '';
+        if (!userId) return;
+        const status = await getOnboardingStatus(userId);
+        const data: any = (status as any)?.data || status;
+        if (data?.status === 'completed') { navigate('/seller/dashboard'); return; }
+        const steps = data?.steps || {};
+        if (!steps.otpVerified || !steps.basicInfo) { navigate('/whatsapp-otp-verification'); return; }
+        if (!steps.emailVerified) { navigate('/email-verification-page'); return; }
+        if (steps.address && !steps.idVerification) { navigate('/business-setup'); return; }
+        if (steps.address && steps.idVerification && !steps.bank) { navigate('/bank-verification'); return; }
+      } catch {}
+    })();
+  }, [navigate]);
+  const pickupDistricts = useMemo(
+    () => (formData.pickupProvince ? pkProvinceDistricts[formData.pickupProvince] || [] : []),
+    [formData.pickupProvince]
+  );
+  const returnDistricts = useMemo(
+    () => (formData.returnProvince ? pkProvinceDistricts[formData.returnProvince] || [] : []),
+    [formData.returnProvince]
+  );
 
   const handleInputChange = (field: keyof AddressFormData, value: string | boolean) => {
     setFormData(prev => {
@@ -31,26 +65,71 @@ const SellerAddressSetup: React.FC = () => {
         [field]: value,
       };
       
-      // If "same as pickup" is checked, clear the return address fields
+      // If province changes, reset the corresponding district
+      if (field === 'pickupProvince') newData.pickupDistrict = '';
+      if (field === 'returnProvince') newData.returnDistrict = '';
+      // If "same as pickup" is checked, mirror values for return
       if (field === 'sameAsPickup' && value === true) {
-        newData.returnAddress = '';
-        newData.returnRegion = '';
+        newData.returnAddress = newData.pickupAddress;
+        newData.returnProvince = newData.pickupProvince;
+        newData.returnDistrict = newData.pickupDistrict;
       }
       
       return newData;
     });
   };
 
+  const isFormValid = React.useMemo(() => {
+    if (!formData.pickupAddress || !formData.pickupProvince || !formData.pickupDistrict) {
+      return false;
+    }
+    if (!formData.sameAsPickup && (!formData.returnAddress || !formData.returnProvince || !formData.returnDistrict)) {
+      return false;
+    }
+    return true;
+  }, [formData]);
+
   // Mobile/Desktop: unified submit action (no form event required)
   const handleSubmit = async () => {
     setIsLoading(true);
     
     try {
-      // Here you would typically send the data to your backend
-      console.log('Address data:', formData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // client-side validation
+      const nextErrors: Partial<Record<keyof AddressFormData, string>> = {};
+      if (!formData.pickupAddress) nextErrors.pickupAddress = 'Pickup address is required';
+      if (!formData.pickupProvince) nextErrors.pickupProvince = 'Pickup province is required';
+      if (!formData.pickupDistrict) nextErrors.pickupDistrict = 'Pickup district is required';
+      if (!formData.sameAsPickup) {
+        if (!formData.returnAddress) nextErrors.returnAddress = 'Return address is required';
+        if (!formData.returnProvince) nextErrors.returnProvince = 'Return province is required';
+        if (!formData.returnDistrict) nextErrors.returnDistrict = 'Return district is required';
+      }
+      setErrors(nextErrors);
+      if (Object.keys(nextErrors).length) {
+        return;
+      }
+      const userId = (() => { try { return localStorage.getItem('onboardingUserId') || localStorage.getItem('userId') || ''; } catch { return ''; } })();
+      if (!userId) throw new Error('Missing userId for onboarding');
+      const address = formData.sameAsPickup
+        ? {
+            pickupAddress: formData.pickupAddress,
+            pickupProvince: formData.pickupProvince,
+            pickupDistrict: formData.pickupDistrict,
+            returnAddress: formData.pickupAddress,
+            returnProvince: formData.pickupProvince,
+            returnDistrict: formData.pickupDistrict,
+            sameAsPickup: true,
+          }
+        : {
+            pickupAddress: formData.pickupAddress,
+            pickupProvince: formData.pickupProvince,
+            pickupDistrict: formData.pickupDistrict,
+            returnAddress: formData.returnAddress,
+            returnProvince: formData.returnProvince,
+            returnDistrict: formData.returnDistrict,
+            sameAsPickup: false,
+          };
+      await submitAddress({ userId, address });
       
       // Navigate to the next step (you can customize this based on your flow)
       navigate('/business-setup'); // Navigate to business setup page
@@ -97,18 +176,22 @@ const SellerAddressSetup: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile: compact select; Desktop: large select */}
+        {/* Pickup Province */}
         <div className="mb-4 md:mb-[27px]">
+          <label className="block mb-1 md:mb-2 text-[10px] md:text-[15px] text-[#767676]">Province</label>
           <div className="relative">
             <select
-              value={formData.region}
-              onChange={(e) => handleInputChange('region', e.target.value)}
-              className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] py-[10px] md:py-[19px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)] appearance-none"
+              value={formData.pickupProvince}
+              onChange={(e) => handleInputChange('pickupProvince', e.target.value)}
+              className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] pr-[40px] md:pr-[48px] py-[10px] md:py-[19px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)] appearance-none"
             >
-              <option value="" disabled>Region/City/District</option>
+              <option value="" disabled>Province</option>
+              {provinces.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
             </select>
-            <div className="absolute right-[18px] md:right-[29px] top-[10px] md:top-[22px]">
-              <svg width="12" height="20" viewBox="0 0 24 24" fill="none">
+            <div className="pointer-events-none absolute inset-y-0 right-[18px] md:right-[29px] flex items-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M2 6.25L12 17.03L22 6.25"
                   stroke="#B8B1B1"
@@ -119,6 +202,41 @@ const SellerAddressSetup: React.FC = () => {
               </svg>
             </div>
           </div>
+          {/* errors */}
+          {errors.pickupAddress ? (<div className="text-red-500 text-[10px] md:text-[14px] mt-1">{errors.pickupAddress}</div>) : null}
+          {errors.pickupProvince ? (<div className="text-red-500 text-[10px] md:text-[14px] mt-1">{errors.pickupProvince}</div>) : null}
+          {errors.pickupDistrict ? (<div className="text-red-500 text-[10px] md:text-[14px] mt-1">{errors.pickupDistrict}</div>) : null}
+        </div>
+
+        {/* Pickup District */}
+        <div className="mb-4 md:mb-[27px]">
+          <label className="block mb-1 md:mb-2 text-[10px] md:text-[15px] text-[#767676]">District</label>
+          <div className="relative">
+            <select
+              value={formData.pickupDistrict}
+              onChange={(e) => handleInputChange('pickupDistrict', e.target.value)}
+              className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] pr-[40px] md:pr-[48px] py-[10px] md:py-[19px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)] appearance-none"
+            >
+              <option value="" disabled>District</option>
+              {pickupDistricts.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-[18px] md:right-[29px] flex items-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M2 6.25L12 17.03L22 6.25"
+                  stroke="#B8B1B1"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+          {errors.returnAddress ? (<div className="text-red-500 text-[10px] md:text-[14px] mt-1">{errors.returnAddress}</div>) : null}
+          {errors.returnProvince ? (<div className="text-red-500 text-[10px] md:text-[14px] mt-1">{errors.returnProvince}</div>) : null}
+          {errors.returnDistrict ? (<div className="text-red-500 text-[10px] md:text-[14px] mt-1">{errors.returnDistrict}</div>) : null}
         </div>
 
         {/* Mobile: compact subheading; Desktop: larger subheading */}
@@ -182,18 +300,50 @@ const SellerAddressSetup: React.FC = () => {
               </div>
             </div>
 
-            {/* Return Region/City/District Dropdown */}
+            {/* Return Province */}
             <div className="mb-6 md:mb-[54px]">
+              <label className="block mb-1 md:mb-2 text-[10px] md:text-[15px] text-[#767676]">Province</label>
               <div className="relative">
                 <select
-                  value={formData.returnRegion}
-                  onChange={(e) => handleInputChange('returnRegion', e.target.value)}
-                  className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] py-[10px] md:py-[19px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)] appearance-none"
+                  value={formData.returnProvince}
+                  onChange={(e) => handleInputChange('returnProvince', e.target.value)}
+                  className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] pr-[40px] md:pr-[48px] py-[10px] md:py-[19px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)] appearance-none"
                 >
-                  <option value="" disabled>Region/City/District</option>
+                  <option value="" disabled>Province</option>
+                  {provinces.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
                 </select>
-                <div className="absolute right-[18px] md:right-[29px] top-[10px] md:top-[22px]">
-                  <svg width="12" height="20" viewBox="0 0 24 24" fill="none">
+                <div className="pointer-events-none absolute inset-y-0 right-[18px] md:right-[29px] flex items-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M2 6.25L12 17.03L22 6.25"
+                      stroke="#B8B1B1"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Return District */}
+            <div className="mb-6 md:mb-[54px]">
+              <label className="block mb-1 md:mb-2 text-[10px] md:text-[15px] text-[#767676]">District</label>
+              <div className="relative">
+                <select
+                  value={formData.returnDistrict}
+                  onChange={(e) => handleInputChange('returnDistrict', e.target.value)}
+                  className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] pr-[40px] md:pr-[48px] py-[10px] md:py-[19px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)] appearance-none"
+                >
+                  <option value="" disabled>District</option>
+                  {returnDistricts.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-[18px] md:right-[29px] flex items-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M2 6.25L12 17.03L22 6.25"
                       stroke="#B8B1B1"
@@ -214,7 +364,7 @@ const SellerAddressSetup: React.FC = () => {
             type="button"
             text="Continue Next"
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isLoading || !isFormValid}
             className="w-[352px] md:w-[234px] h-[38px] md:h-[67px] bg-[#2ECC71] text-white text-[16px] md:text-[30px] font-medium md:font-bold rounded-[10px] md:rounded-[15px]"
           />
         </div>

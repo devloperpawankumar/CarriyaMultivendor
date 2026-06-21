@@ -13,13 +13,37 @@ import { fetchReports } from './services/reportService';
 
 const ManageReports: React.FC = () => {
   const [data, setData] = useState<ReportsResponse | null>(null);
-  const [range, setRange] = useState<string>('Today');
+  const [range, setRange] = useState<string>('Last 30 Days');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+    
     (async () => {
-      const res = await fetchReports(range);
-      setData(res);
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetchReports(range);
+        if (mounted) {
+          setData(res);
+          setError(null);
+        }
+      } catch (err: any) {
+        if (mounted) {
+          setError(err?.message || 'Failed to load reports');
+          console.error('Error loading reports:', err);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
     })();
+    
+    return () => {
+      mounted = false;
+    };
   }, [range]);
 
   return (
@@ -31,7 +55,20 @@ const ManageReports: React.FC = () => {
           {/* <FiltersBar selected={range} onChange={setRange} /> */}
         </div>
 
-        {data && (
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-gray-500">Loading reports...</div>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="text-red-800">{error}</div>
+            <div className="text-sm text-red-600 mt-2">Using mock data as fallback.</div>
+          </div>
+        )}
+
+        {data && !loading && (
           <>
             <div className="mb-8">
               <ReportSummaryCards summary={data.summary} />

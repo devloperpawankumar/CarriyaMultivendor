@@ -3,38 +3,24 @@ import OrderDetailsPage from './OrderDetailsPage';
 import ReturnedOrderDetailsPage from './ReturnedOrderDetailsPage';
 import TrackOrderPage from './TrackOrderPage';
 import DisapproveReturnPage from './DisapproveReturnPage';
-
-export interface OrderDetails {
-  id: string;
-  customerName: string;
-  address: string;
-  paymentMethod: string;
-  paymentStatus: string;
-  orderDate: string;
-  shippingCharges: string;
-  productName: string;
-  unitPrice: string;
-  quantity: number;
-  platformCommission: string;
-  discount: string;
-  sellerPayout: string;
-  productImage?: string;
-  // Return/Cancellation specific (for Canceled/Returned view)
-  isReturned?: boolean;
-  isCanceled?: boolean;
-  returnReason?: string;
-}
+import type { CancelOrderPayload, OrderDetails } from './types/orderTypes';
 
 interface OrderDetailsWrapperProps {
   orderDetails: OrderDetails | null;
-  onUpdateStatus?: () => void;
+  onUpdateStatus?: (status: string) => void;
   onBack?: () => void;
+  onAcceptOrder?: () => void;
+  onCancelOrder?: (payload: CancelOrderPayload) => void;
+  decisionLoading?: boolean;
 }
 
 const OrderDetailsWrapper: React.FC<OrderDetailsWrapperProps> = ({
   orderDetails,
   onUpdateStatus,
   onBack,
+  onAcceptOrder,
+  onCancelOrder,
+  decisionLoading = false,
 }) => {
   const [currentView, setCurrentView] = useState<'details' | 'track' | 'disapprove'>('details');
 
@@ -62,7 +48,8 @@ const OrderDetailsWrapper: React.FC<OrderDetailsWrapperProps> = ({
   if (currentView === 'track') {
     return (
       <TrackOrderPage
-        orderId={orderDetails?.id}
+        orderId={orderDetails?.orderNumber || orderDetails?.id}
+        trackingNumber={orderDetails?.trackingNumber}
         onBack={handleBackToDetails}
       />
     );
@@ -88,12 +75,17 @@ const OrderDetailsWrapper: React.FC<OrderDetailsWrapperProps> = ({
     );
   }
 
+  const EnhancedOrderDetailsPage = OrderDetailsPage as React.ComponentType<any>;
+
   return (
-    <OrderDetailsPage
+    <EnhancedOrderDetailsPage
       orderDetails={orderDetails}
       onUpdateStatus={onUpdateStatus}
       onTrackOrder={handleTrackOrder}
       showTrackOrder={true}
+      onAcceptOrder={onAcceptOrder}
+      onCancelOrder={onCancelOrder}
+      decisionLoading={decisionLoading}
     />
   );
 };

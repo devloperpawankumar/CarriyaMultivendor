@@ -1,5 +1,6 @@
 import React from 'react';
 import { OrderTableProps } from '../types/orderTypes';
+import placeholderProduct from '../../../../assets/images/Product/prodcut1.png';
 
 const ProcessingOrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder, loading }) => {
   if (loading) {
@@ -44,7 +45,7 @@ const ProcessingOrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder,
               {/* Order ID - Green color as per */}
               <div className="col-span-1">
                 <span className="text-[12px] font-extrabold text-green-500">
-                  {order.id}
+                  {order.orderNumber || order.id}
                 </span>
               </div>
 
@@ -71,7 +72,8 @@ const ProcessingOrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder,
                     className="w-[35px] h-[35px] object-cover rounded-[5px]"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/static/media/prodcut1.6413c0aafe4eecade91e.png';
+                      target.onerror = null;
+                      target.src = placeholderProduct;
                     }}
                   />
                 </div>
@@ -101,7 +103,12 @@ const ProcessingOrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder,
               {/* See Order Button */}
               <div className="col-span-1">
                 <button
-                  onClick={() => onViewOrder(order.id)}
+                  onClick={() => {
+                    const orderIdentifier = order.orderNumber || order.id;
+                    if (orderIdentifier) {
+                      onViewOrder(orderIdentifier);
+                    }
+                  }}
                   className="bg-green-500 text-white px-1 py-2 rounded-[5px] text-[12px] font-bold hover:bg-green-600 transition-colors whitespace-nowrap w-[80px]"
                 >
                   See Order &gt;
@@ -114,7 +121,9 @@ const ProcessingOrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder,
               {/* Header Row - Order ID, Date, and Status */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-[12px] font-extrabold text-green-500">{order.id}</span>
+                  <span className="text-[12px] font-extrabold text-green-500">
+                    {order.orderNumber || order.id}
+                  </span>
                   {/* Status Badge */}
                   <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-600">
                     Processing
@@ -132,7 +141,8 @@ const ProcessingOrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder,
                     className="w-[36px] h-[36px] object-cover rounded-[5px]"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/static/media/prodcut1.6413c0aafe4eecade91e.png';
+                      target.onerror = null;
+                      target.src = placeholderProduct;
                     }}
                   />
                 </div>
@@ -153,7 +163,12 @@ const ProcessingOrdersTable: React.FC<OrderTableProps> = ({ orders, onViewOrder,
                   <span className="text-[12px] font-bold text-gray-900">{order.amount}</span>
                 </div>
                 <button
-                  onClick={() => onViewOrder(order.id)}
+                  onClick={() => {
+                    const orderIdentifier = order.orderNumber || order.id;
+                    if (orderIdentifier) {
+                      onViewOrder(orderIdentifier);
+                    }
+                  }}
                   className="bg-green-500 text-white px-3 py-2 rounded-[8px] text-[11px] font-bold hover:bg-green-600 transition-colors shadow-sm"
                 >
                   View Order

@@ -1,6 +1,7 @@
 import React from 'react';
 import heartIcon from '../../assets/images/Favourite Products icon (1).png';
 import deleteIcon from '../../assets/images/Layer_1.png';
+
 type Props = {
   id: string;
   title: string;
@@ -16,15 +17,43 @@ type Props = {
   onRemove: (id: string) => void;
 };
 
-const CartItemRow: React.FC<Props> = ({ id, title, image, price, compareAt, color, size, qty, shopName = 'My Shop', onIncrease, onDecrease, onRemove }) => {
+const formatPKR = (value: number) => `PKR ${value.toLocaleString()}`;
+
+const buildVariantLabel = (color?: string, size?: string) => {
+  const parts = [];
+  if (color) parts.push(`${color} color`);
+  if (size) parts.push(`${size} size`);
+  return parts.length ? parts.join(' , ') : 'Variant not selected';
+};
+
+const CartItemRow: React.FC<Props> = ({
+  id,
+  title,
+  image,
+  price,
+  compareAt,
+  color,
+  size,
+  qty,
+  shopName = 'My Shop',
+  onIncrease,
+  onDecrease,
+  onRemove,
+}) => {
   return (
     <div className="relative border border-[#949494] rounded-[10px] w-full">
       {/* Desktop Layout */}
       <div className="hidden md:block" style={{ width: 793, height: 187 }}>
         {/* Top header row: left small box + shop name; right heart and delete */}
-        <div className="absolute left-[23px] top-[18px] h-[26px] w-[144px] flex items-center gap-2">
+        <div className="absolute left-[23px] top-[18px] h-[26px] w-[230px] flex items-center gap-2">
           <div className="w-[26px] h-[26px] border border-[#949494] rounded-[5px] bg-white" />
-          <span className="text-[20px] leading-[1.3] text-black">{shopName}</span>
+          <span
+            className="text-[20px] leading-[1.3] text-black truncate"
+            style={{ maxWidth: '180px' }}
+            title={shopName}
+          >
+            {shopName}
+          </span>
         </div>
         <div className="absolute right-[24px] top-[25px] h-[25px] flex items-center gap-3">
           <button aria-label="Add to favorites" className="leading-none">
@@ -44,11 +73,15 @@ const CartItemRow: React.FC<Props> = ({ id, title, image, price, compareAt, colo
           <div className="text-[#2ECC71] font-medium text-[20px] leading-[1.3] truncate">{title}</div>
         </div>
         <div className="absolute left-[167px] top-[109px] w-[314px] text-[12px] leading-[1.3] text-black">
-          {color ? `Black color , ${size ?? ''} Size , for men` : 'Black color , XL Size , for men'}
+          {buildVariantLabel(color, size)}
         </div>
-        <div className="absolute left-[524px] top-[89px] w-[106px] text-[20px] font-normal text-black">PKR {price}</div>
+        <div className="absolute left-[524px] top-[89px] w-[106px] text-[20px] font-normal text-black">
+          {formatPKR(price)}
+        </div>
         {typeof compareAt === 'number' && (
-          <div className="absolute left-[524px] top-[115px] w-[106px] text-[20px] text-[#787A80] line-through">PKR -{compareAt}</div>
+          <div className="absolute left-[524px] top-[115px] w-[106px] text-[20px] text-[#787A80] line-through">
+            {formatPKR(compareAt)}
+          </div>
         )}
         {/* Quantity controls: column +, qty (green), - */}
         <div className="absolute right-[40px] top-[78px] flex flex-col items-center gap-2">
@@ -64,7 +97,9 @@ const CartItemRow: React.FC<Props> = ({ id, title, image, price, compareAt, colo
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <div className="w-[18px] h-[18px] border border-[#949494] rounded-[3px] bg-white" />
-            <span className="text-[10px] text-[#4D4D4D]">{shopName}</span>
+            <span className="text-[10px] text-[#4D4D4D] truncate max-w-[120px]" title={shopName}>
+              {shopName}
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <button aria-label="Add to favorites" className="leading-none">
@@ -93,14 +128,16 @@ const CartItemRow: React.FC<Props> = ({ id, title, image, price, compareAt, colo
           <div className="flex-1 min-w-0">
             <div className="text-[13px] font-medium text-[#2ECC71] leading-[1.3] mb-1 truncate">{title}</div>
             <div className="text-[10px] text-[#949494] leading-[1.3] mb-3">
-              {color ? `Black color , ${size ?? ''} Size , for men` : 'Black color , XL Size , for men'}
+              {buildVariantLabel(color, size)}
             </div>
             
             {/* Price row */}
             <div className="flex items-end gap-3 mb-2">
-              <div className="text-[12px] font-bold text-black">PKR {price}</div>
+              <div className="text-[12px] font-bold text-black">{formatPKR(price)}</div>
               {typeof compareAt === 'number' && (
-                <div className="text-[5px] text-[#787A80] line-through">PKR -{compareAt}</div>
+                <div className="text-[5px] text-[#787A80] line-through">
+                  {formatPKR(compareAt)}
+                </div>
               )}
             </div>
           </div>

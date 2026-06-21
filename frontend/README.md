@@ -1,3 +1,11 @@
+API base configuration
+
+- Central client: `src/services/api.ts`
+- Default: uses `REACT_APP_API_BASE_URL` when set; else same-origin ('')
+- Local dev options:
+  - Create `.env` with `REACT_APP_API_BASE_URL=http://localhost:4000`
+  - Or add `"proxy": "http://localhost:4000"` in `package.json`
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

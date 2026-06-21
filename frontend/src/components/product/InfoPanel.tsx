@@ -14,12 +14,15 @@ const InfoPanel: React.FC<{
   rating: number;
   reviews: number;
   colors: string[];
+  colorsWithHex?: { name: string; hex?: string }[];
   sizes: string[];
   onAddToCart?: (details: { quantity: number; color?: string; size?: string }) => void;
   productId: string;
   productTitle: string;
   productImage: string;
-}> = ({ price, compareAt, currency, sales, rating, reviews, colors, sizes, onAddToCart, productId, productTitle, productImage }) => {
+  sellerId?: string;
+  sellerSlug?: string;
+}> = ({ price, compareAt, currency, sales, rating, reviews, colors, colorsWithHex, sizes, onAddToCart, productId, productTitle, productImage, sellerId, sellerSlug }) => {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [dropdownColor, setDropdownColor] = useState(colors[0]);
   const [dropdownSize, setDropdownSize] = useState(sizes[0]);
@@ -52,9 +55,32 @@ const InfoPanel: React.FC<{
         <div className="text-[14px] font-normal text-[#424551]">Color</div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-4">
-            {colors.map((c) => (
-              <button key={c} onClick={() => setSelectedColor(c)} className={`w-6 h-6 rounded-full border-2 ${selectedColor === c ? 'border-[#17696A]' : 'border-[#D7DADD]'}`} title={c} style={{ backgroundColor: c.toLowerCase() === 'pink' ? '#FFB6C1' : c.toLowerCase() === 'blue' ? '#C0DDED' : c.toLowerCase() === 'yellow' ? '#FEDE41' : '#eee' }} />
-            ))}
+            {colors.map((colorName) => {
+              // Get hex value from colorsWithHex if available, otherwise infer from name
+              const colorObj = colorsWithHex?.find(c => c.name === colorName);
+              const hexValue = colorObj?.hex || (
+                colorName.toLowerCase() === 'pink' ? '#FFB6C1' 
+                : colorName.toLowerCase() === 'blue' ? '#C0DDED' 
+                : colorName.toLowerCase() === 'yellow' ? '#FEDE41' 
+                : colorName.toLowerCase() === 'red' ? '#FF3B30'
+                : colorName.toLowerCase() === 'green' ? '#34C759'
+                : colorName.toLowerCase() === 'black' ? '#000000'
+                : colorName.toLowerCase() === 'white' ? '#FFFFFF'
+                : colorName.toLowerCase() === 'gray' || colorName.toLowerCase() === 'grey' ? '#8E8E93'
+                : colorName.startsWith('#') ? colorName // If it's already a hex code
+                : '#eee'
+              );
+              
+              return (
+                <button 
+                  key={colorName} 
+                  onClick={() => setSelectedColor(colorName)} 
+                  className={`w-6 h-6 rounded-full border-2 ${selectedColor === colorName ? 'border-[#17696A]' : 'border-[#D7DADD]'}`} 
+                  title={colorName}
+                  style={{ backgroundColor: hexValue }} 
+                />
+              );
+            })}
           </div>
           
           <span className="text-[14px] font-normal text-[#9A9CA5]">{selectedColor}</span>
@@ -85,9 +111,37 @@ const InfoPanel: React.FC<{
           </button>
           {colorOpen && (
             <div className="border-t border-[#E0E0E0] py-1">
-              {colors.map((c) => (
-                <button key={c} type="button" onClick={() => { setDropdownColor(c); setColorOpen(false); }} className={`w-full text-left px-4 py-2 text-[14px] ${dropdownColor === c ? 'bg-[#F5F5F5]' : ''}`}>{c}</button>
-              ))}
+              {colors.map((colorName) => {
+                // Get hex value from colorsWithHex if available, otherwise infer from name
+                const colorObj = colorsWithHex?.find(c => c.name === colorName);
+                const hexValue = colorObj?.hex || (
+                  colorName.toLowerCase() === 'pink' ? '#FFB6C1' 
+                  : colorName.toLowerCase() === 'blue' ? '#C0DDED' 
+                  : colorName.toLowerCase() === 'yellow' ? '#FEDE41' 
+                  : colorName.toLowerCase() === 'red' ? '#FF3B30'
+                  : colorName.toLowerCase() === 'green' ? '#34C759'
+                  : colorName.toLowerCase() === 'black' ? '#000000'
+                  : colorName.toLowerCase() === 'white' ? '#FFFFFF'
+                  : colorName.toLowerCase() === 'gray' || colorName.toLowerCase() === 'grey' ? '#8E8E93'
+                  : colorName.startsWith('#') ? colorName // If it's already a hex code
+                  : '#eee'
+                );
+                
+                return (
+                  <button 
+                    key={colorName} 
+                    type="button" 
+                    onClick={() => { setDropdownColor(colorName); setColorOpen(false); }} 
+                    className={`w-full text-left px-4 py-2 text-[14px] flex items-center gap-2 ${dropdownColor === colorName ? 'bg-[#F5F5F5]' : ''}`}
+                  >
+                    <span 
+                      className="w-4 h-4 rounded-full border border-gray-300" 
+                      style={{ backgroundColor: hexValue }} 
+                    />
+                    <span>{colorName}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -133,7 +187,16 @@ const InfoPanel: React.FC<{
 
         <button
           className="w-full h-11 bg-[#2ECC71] text-white rounded flex items-center justify-center"
-          onClick={() => navigate('/sellerstore')}
+          onClick={() => {
+            const target = sellerSlug
+              ? `/seller/${sellerSlug}`
+              : sellerId
+              ? `/seller/${sellerId}`
+              : null;
+            if (target) {
+              navigate(target);
+            }
+          }}
         >
           <span className="text-[14px] font-bold tracking-[0.5px]">See Seller Store</span>
         </button>

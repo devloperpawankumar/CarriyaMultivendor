@@ -13,13 +13,32 @@ const EditContent: React.FC = () => {
 			<AdminLayout
 				sidebar={
 					<AdminSidebar
-						activeKey="edit-content"
+						activeKey="settings"
 						topLogoSrc={require('../../assets/images/Carriya logo 1.png')}
 						bottomLogoSrc={require('../../assets/images/Carriya logo 1.png')}
 						onMenuClick={(key) => {
-							if (key === 'new-sellers') navigate('/admin/dashboard');
-							if (key === 'edit-content') navigate('/admin/edit-content');
-						if (key === 'see-transaction') navigate('/admin/transactions');
+							switch (key) {
+								case 'dashboard':
+									navigate('/admin/dashboard');
+									break;
+								case 'users':
+									navigate('/admin/buyers');
+									break;
+								case 'sellers':
+									navigate('/admin/sellers');
+									break;
+								case 'orders':
+									navigate('/admin/orders');
+									break;
+								case 'payments':
+									navigate('/admin/payments');
+									break;
+								case 'settings':
+									navigate('/admin/edit-content');
+									break;
+								default:
+									break;
+							}
 						}}
 					/>
 				}

@@ -56,75 +56,116 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ sidebar, header, children }) 
 	}, [menuOpen]);
 
 	return (
-		<div className="grid grid-cols-1 lg:grid-cols-[366px_1fr] gap-0">
+		<div className="grid grid-cols-1 lg:grid-cols-[256px_1fr] gap-0">
 			{/* Desktop Sidebar */}
 			<aside className="bg-white overflow-hidden hidden lg:block">
 				{sidebar}
 			</aside>
 
-			{/* Content */}
-			<section className="relative overflow-x-hidden">
-				{/* Mobile header with hamburger */}
-				<div className="lg:hidden w-full flex items-center justify-between px-4 pt-4 pb-2">
+		{/* Content */}
+		<section className="relative overflow-x-hidden bg-white">
+			{/* Mobile header with green bar, logo, and hamburger */}
+			<div className="lg:hidden w-full">
+				{/* Green bar - matches desktop AdminTopGreenHeader */}
+				<div className="w-full flex items-center justify-center h-[48px]" style={{ backgroundColor: '#2ECC71' }}>
+					<span className="text-white text-[16px] font-semibold" style={{ fontFamily: 'Roboto', fontWeight: 600 }}>
+						Carriya Admin Panel
+					</span>
+				</div>
+				
+				{/* Logo and hamburger row */}
+				<div className="w-full flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
 					<img
 						src={require('../../assets/images/Carriya logo 1.png')}
 						alt="Carriya"
-						className="h-[29px] w-auto rounded"
+						className="h-[26px] w-auto"
 					/>
 					<button
 						aria-label="Open menu"
 						onClick={() => setMenuOpen(true)}
-						className="p-2"
+						className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
 					>
-						<img
-							src={require('../../assets/images/Seller/hamberger.png')}
-							alt="menu"
-							className="w-4 h-4"
-							style={{ filter: 'brightness(0) saturate(100%)' }}
-						/>
+						<svg 
+							width="24" 
+							height="24" 
+							viewBox="0 0 24 24" 
+							fill="none" 
+							xmlns="http://www.w3.org/2000/svg"
+							className="text-gray-700"
+						>
+							<path 
+								d="M3 12h18M3 6h18M3 18h18" 
+								stroke="currentColor" 
+								strokeWidth="2" 
+								strokeLinecap="round"
+							/>
+						</svg>
 					</button>
 				</div>
+			</div>
 
 				{header ? (
-					<div className=" rounded-[25px] overflow-hidden mb-3">
+					<div className="overflow-hidden">
 						{header}
 					</div>
 				) : null}
 				{children}
 			</section>
 
-			{/* Mobile full-screen menu overlay (match seller dashboard style) */}
-			{menuOpen ? (
-				<div
-					className="lg:hidden fixed inset-0 z-50 bg-white overflow-hidden h-screen w-screen flex flex-col"
-					role="dialog"
-					aria-modal="true"
-					onWheel={(e) => { e.preventDefault(); }}
-					onTouchMove={(e) => { e.preventDefault(); }}
-					style={{ touchAction: 'none', overscrollBehavior: 'none' }}
-				>
-					{/* Top bar */}
-					<div className="flex items-center justify-between px-4 pt-5 pb-3 border-b border-[#E5E7EB]">
-						{/* Single logo shown here; sidebar hides its own logo in mobile mode */}
-						<img src={require('../../assets/images/Carriya logo 1.png')} alt="Carriya" className="h-[29px] w-auto rounded" />
-						<div className="flex items-center gap-3">
-							{/* <img src={require('../../assets/images/Seller/rightTop.png')} alt="right-top" className="w-5 h-5" />
-							<img src={require('../../assets/images/Seller/rightBottom.png')} alt="right-bottom" className="w-5 h-5" /> */}
-							<button aria-label="Close menu" className="p-2" onClick={() => setMenuOpen(false)}>
-								<span className="block w-4 h-4" style={{ position: 'relative' }}>
-									<span className="absolute inset-0 rotate-45 bg-black" style={{ height: 2, top: '50%' }} />
-									<span className="absolute inset-0 -rotate-45 bg-black" style={{ height: 2, top: '50%' }} />
-								</span>
-							</button>
-						</div>
-					</div>
-					{/* Menu content */}
-					<div className="p-4 flex-1 overflow-hidden">
-						{/* Inject sidebar with mobile styling */}
-						{React.isValidElement(sidebar) ? React.cloneElement(sidebar as any, { isMobile: true }) : sidebar}
-					</div>
+		{/* Mobile full-screen menu overlay */}
+		{menuOpen ? (
+			<div
+				className="lg:hidden fixed inset-0 z-50 bg-white overflow-hidden h-screen w-screen flex flex-col"
+				role="dialog"
+				aria-modal="true"
+				onWheel={(e) => { e.preventDefault(); }}
+				onTouchMove={(e) => { e.preventDefault(); }}
+				style={{ touchAction: 'none', overscrollBehavior: 'none' }}
+			>
+				{/* Green header bar in mobile menu */}
+				<div className="w-full flex items-center justify-center h-[48px]" style={{ backgroundColor: '#2ECC71' }}>
+					<span className="text-white text-[16px] font-semibold" style={{ fontFamily: 'Roboto', fontWeight: 600 }}>
+						Carriya Admin Panel
+					</span>
 				</div>
-			) : null}
+				
+				{/* Top bar with logo and close button */}
+				<div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E7EB] bg-white">
+					<img 
+						src={require('../../assets/images/Carriya logo 1.png')} 
+						alt="Carriya" 
+						className="h-[26px] w-auto" 
+					/>
+					<button 
+						aria-label="Close menu" 
+						className="p-2 hover:bg-gray-50 rounded-lg transition-colors" 
+						onClick={() => setMenuOpen(false)}
+					>
+						<svg 
+							width="20" 
+							height="20" 
+							viewBox="0 0 20 20" 
+							fill="none" 
+							xmlns="http://www.w3.org/2000/svg"
+							className="text-gray-700"
+						>
+							<path 
+								d="M15 5L5 15M5 5l10 10" 
+								stroke="currentColor" 
+								strokeWidth="2" 
+								strokeLinecap="round"
+							/>
+						</svg>
+					</button>
+				</div>
+				
+				{/* Menu content */}
+				<div className="p-4 flex-1 overflow-y-auto">
+					{/* Inject sidebar with mobile styling */}
+					{React.isValidElement(sidebar) ? React.cloneElement(sidebar as any, { isMobile: true }) : sidebar}
+				</div>
+			</div>
+		) : null}
 		</div>
 	);
 };

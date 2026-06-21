@@ -1,278 +1,618 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminTopGreenHeader from '../../components/admin/AdminTopGreenHeader';
 import AdminLayout from '../../components/admin/AdminLayout';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import AdminTopBar from '../../components/admin/AdminTopBar';
 import Footer from '../../components/Footer';
-import uploadImage from '../../assets/images/auth/Upload.png';
-import { fetchNewSellers } from '../../services/adminService';
-import { AdminSellerDetails } from '../../types/admin';
-
-const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-	<p
-		className="text-black font-semibold text-[15px] md:text-[35px]"
-		style={{ fontFamily: 'Roboto', lineHeight: '1.171875em' }}
-	>
-		{children}
-	</p>
-);
-
-const ValueCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
-	<div
-		className={[
-			'bg-white rounded-[10px] border',
-			'border-[#E2E0E0]',
-			'shadow-[2px_3px_4px_rgba(46,204,113,0.25)]',
-			'flex items-center',
-			className || ''
-		].join(' ')}
-	>
-		<div className="px-4 md:px-7 py-3 md:py-5 w-full">
-			<p className="text-black font-medium text-[15px] md:text-[25px]" style={{ fontFamily: 'Roboto', lineHeight: '1.171875em' }}>
-				{children}
-			</p>
-		</div>
-	</div>
-);
-const InputCard: React.FC<{
-    value: string;
-    onChange: (v: string) => void;
-    placeholder: string;
-    className?: string;
-}> = ({ value, onChange, placeholder, className }) => (
-	<div
-		className={[
-			'bg-white rounded-[10px] border',
-			'border-[#E2E0E0]',
-			'shadow-[2px_3px_4px_rgba(46,204,113,0.25)]',
-			'flex items-center',
-			className || ''
-		].join(' ')}
-	>
-        <input
-			type="text"
-			value={value}
-			onChange={(e) => onChange(e.target.value)}
-			placeholder={placeholder}
-            className="w-full h-full px-4 md:px-7 py-3 md:py-5 text-black placeholder-[#B8B1B1] focus:outline-none font-medium text-[15px] md:text-[25px]"
-			style={{ fontFamily: 'Roboto', lineHeight: '1.171875em', borderRadius: 10 }}
-            readOnly
-            // disabled
-		/>
-	</div>
-);
-
-const UploadCard: React.FC<{ label: string; onChange?: (file: File) => void }> = ({ label, onChange }) => (
-    <div className="relative" style={{ width: 273.02, height: 128 }}>
-		{/* Outer rectangle: 273.02x128, 1.5px border #B8B1B1, radius 20 */ }
-		<div className="absolute  bg-white inset-0 rounded-[20px]" style={{ borderColor: '#B8B1B1', borderWidth: 1.5, borderStyle: 'solid' }} />
-		{/* Inner rectangle: positioned at x:59, y:16 with size 154x80, 1px border #2ECC71, radius 25 */}
-		<div className="absolute rounded-[25px] flex items-center justify-center" style={{ left: 59, top: 16, width: 154, height: 80, borderColor: '#2ECC71', borderWidth: 1, borderStyle: 'solid' }}>
-			{/* Icon frame: ~centered within inner rect; image colored green as in figma */}
-			<div style={{ width: 70.79, height: 71.82 }} className="flex items-center justify-center">
-				<img src={uploadImage} alt="Upload" />
-			</div>
-		</div>
-		{/* Label text inside group: positioned at x:107, y:101; Roboto 20, color #B8B1B1 */}
-		<p className="absolute" style={{ left: 107, top: 101, fontFamily: 'Roboto', fontWeight: 400, fontSize: 20, color: '#B8B1B1' }}>{label}</p>
-		{/* Transparent input overlay */}
-		<input
-			type="file"
-			accept="image/*"
-			onChange={(e) => {
-				if (e.target.files && e.target.files[0]) {
-					onChange && onChange(e.target.files[0]);
-				}
-			}}
-            className="absolute inset-0 w-full h-full opacity-0"
-            disabled
-            aria-disabled="true"
-		/>
-	</div>
-);
+import { fetchSellerDetails, approveSeller, suspendSeller, reactivateSeller, SellerDetailsResponse } from '../../services/adminService';
+import { useToast } from '../../contexts/ToastContext';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 const SellerDetails: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-	const [seller, setSeller] = useState<AdminSellerDetails | undefined>(undefined);
-	const [form, setForm] = useState({
-		firstName: '',
-		lastName: '',
-		phone: '',
-		email: '',
-		company: '',
-		pickupAddress: '',
-		returnAddress: '',
-		nameOnId: '',
-		idCardNumber: '',
-		iban: '',
-		accountNumber: '',
-		bankName: '',
-		branchCode: ''
-	});
+	const { showToast } = useToast();
+	
+	const [seller, setSeller] = useState<SellerDetailsResponse | null>(null);
+	console.log('seller data', seller);		 	
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const [actionLoading, setActionLoading] = useState<string | null>(null);
+	const [confirmSuspendOpen, setConfirmSuspendOpen] = useState(false);
+
 
 	useEffect(() => {
-		const ac = new AbortController();
-		fetchNewSellers(ac.signal).then((list) => {
-			const base = list.find((s) => s.id === id);
-			if (base) {
+		console.log("UPDATED seller:", seller);
+	  }, [seller]);
+	// Fetch seller details
+	useEffect(() => {
+		if (!id) return;
 		
-				setSeller({
-					...base,
-					phone: '+92 321 1234569',
-					email: 'Hismail@gmail.com',
-					company: 'ABC Limited',
-					pickupAddress: 'His pick up address',
-					returnAddress: 'His Return address',
-					idCardNumber: '35303-******-*',
-					iban: 'PK838239020388383',
-					accountNumber: 'PK838239020388383',
-					bankName: 'HBL Bank',
-					branchCode: '4455'
-				});
+		
+		// const controller = new AbortController();
+		
+		const loadSellerDetails = async () => {
+			try {
+				setLoading(true);
+				setError(null);
+				
+				const data = await fetchSellerDetails(id);
+				console.log("API response:", data);
+				
+			
+				
+				if (data) {
+					console.log('before setSeller', data);
+					setSeller(data);
+					console.log('after setSeller', data);
+				} else {
+					setError('Seller not found');
+				}
+			} catch (err: any) {
+				if (err.name !== 'AbortError') {
+					setError('Failed to load seller details');
+					console.error('Error loading seller details:', err);
+				}
+			} finally {
+				setLoading(false);
 			}
-		});
-		return () => ac.abort();
+		};
+		
+		loadSellerDetails();
+		
+		// return () => controller.abort();
 	}, [id]);
 
-	useEffect(() => {
-		if (seller) {
-			setForm({
-				firstName: seller.firstName || '',
-				lastName: seller.lastName || '',
-				phone: seller.phone || '',
-				email: seller.email || '',
-				company: seller.company || '',
-				pickupAddress: seller.pickupAddress || '',
-				returnAddress: seller.returnAddress || '',
-				nameOnId: `${seller.firstName || ''} ${seller.lastName || ''}`.trim(),
-				idCardNumber: seller.idCardNumber || '',
-				iban: seller.iban || '',
-				accountNumber: seller.accountNumber || '',
-				bankName: seller.bankName || '',
-				branchCode: seller.branchCode || ''
-			});
+	
+
+	// Handle menu navigation
+	const handleMenuClick = (key: string) => {
+		switch (key) {
+			case 'dashboard':
+				navigate('/admin/dashboard');
+				break;
+			case 'users':
+				navigate('/admin/buyers');
+				break;
+			case 'sellers':
+				navigate('/admin/sellers');
+				break;
+			case 'orders':
+				navigate('/admin/orders');
+				break;
+			case 'payments':
+				navigate('/admin/payments');
+				break;
+			case 'settings':
+				navigate('/admin/settings');
+				break;
+			default:
+				break;
 		}
-	}, [seller]);
+	};
+
+	// Handle approve seller
+	const handleApproveSeller = async () => {
+		if (!id || !seller) return;
+		
+		setActionLoading('approve');
+		try {
+			const result = await approveSeller(id);
+			if (result.success) {
+				// Refresh seller details
+				const updated = await fetchSellerDetails(id);
+				if (updated) setSeller(updated);
+				showToast({ type: 'success', title: 'Approved', message: 'Seller approved successfully!' });
+			} else {
+				showToast({ type: 'error', title: 'Error', message: result.message || 'Failed to approve seller' });
+			}
+		} catch (err) {
+			showToast({ type: 'error', title: 'Error', message: 'Failed to approve seller' });
+		} finally {
+			setActionLoading(null);
+		}
+	};
+
+	// Handle suspend seller
+	const handleSuspendSeller = async () => {
+		if (!id || !seller) return;
+		setConfirmSuspendOpen(true);
+	};
+
+	const confirmSuspendSeller = async () => {
+		if (!id || !seller) return;
+		setActionLoading('suspend');
+		try {
+			const result = await suspendSeller(id);
+			if (result.success) {
+				// Refresh seller details
+				const updated = await fetchSellerDetails(id);
+				if (updated) setSeller(updated);
+				setConfirmSuspendOpen(false);
+				showToast({ type: 'success', title: 'Suspended', message: 'Seller suspended successfully!' });
+			} else {
+				showToast({ type: 'error', title: 'Error', message: result.message || 'Failed to suspend seller' });
+			}
+		} catch (err) {
+			showToast({ type: 'error', title: 'Error', message: 'Failed to suspend seller' });
+		} finally {
+			setActionLoading(null);
+		}
+	};
+
+	// Handle reactivate seller
+	const handleReactivateSeller = async () => {
+		if (!id || !seller) return;
+
+		// const confirmed = window.confirm('Are you sure you want to reactivate this seller?');
+		// if (!confirmed) return;
+
+		setActionLoading('reactivate');
+		try {
+			const result = await reactivateSeller(id);
+			if (result.success) {
+				const updated = await fetchSellerDetails(id);
+				if (updated) setSeller(updated);
+				showToast({ type: 'success', title: 'Reactivated', message: 'Seller reactivated successfully!' });
+			} else {
+				showToast({ type: 'error', title: 'Error', message: result.message || 'Failed to reactivate seller' });
+			}
+		} catch (err) {
+			showToast({ type: 'error', title: 'Error', message: 'Failed to reactivate seller' });
+		} finally {
+			setActionLoading(null);
+		}
+	};
+
+	// Get status badge style
+	const getStatusBadgeStyle = (status: string) => {
+		switch (status) {
+			case 'Active':
+				return 'bg-[#DCFCE7] text-[#008236] border border-[#B9F8CF]';
+			case 'Pending':
+				return 'bg-[#FEF9C2] text-[#A65F00] border border-[#FFF085]';
+			case 'Suspended':
+				return 'bg-[#FFE2E2] text-[#C10007] border border-[#FFC9C9]';
+			default:
+				return 'bg-gray-100 text-gray-600 border border-gray-300';
+		}
+	};
+
+	if (loading) {
+		return (
+			<div className="min-h-screen bg-white">
+				<AdminTopGreenHeader />
+				<AdminLayout
+					sidebar={
+						<AdminSidebar
+							topLogoSrc={require('../../assets/images/Carriya logo 1.png')}
+							activeKey="sellers"
+							onMenuClick={handleMenuClick}
+						/>
+					}
+					header={<AdminTopBar title="Seller Details" />}
+				>
+					<div className="flex justify-center items-center py-20">
+						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2ECC71]"></div>
+					</div>
+				</AdminLayout>
+				<Footer />
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="min-h-screen bg-white">
+				<AdminTopGreenHeader />
+				<AdminLayout
+					sidebar={
+						<AdminSidebar
+							topLogoSrc={require('../../assets/images/Carriya logo 1.png')}
+							activeKey="sellers"
+							onMenuClick={handleMenuClick}
+						/>
+					}
+					header={<AdminTopBar title="Seller Details" />}
+				>
+					<div className="flex flex-col items-center justify-center py-20">
+						<p className="text-red-600 text-lg mb-4">{error || 'Seller not found'}</p>
+						<button
+							onClick={() => navigate('/admin/sellers')}
+							className="text-[#2ECC71] hover:underline"
+						>
+							Back to Sellers
+						</button>
+					</div>
+				</AdminLayout>
+				<Footer />
+			</div>
+		);
+	}
+	if (!seller) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<p>Loading seller...</p>
+			</div>
+		);
+	}
 
 	return (
-		<div className="min-h-screen bg-white lg:bg-[#F0FFF7]">
+		<div className="min-h-screen bg-[#F9FAFB]">
 			<AdminTopGreenHeader />
 			<AdminLayout
-				sidebar={<AdminSidebar activeKey="new-sellers" topLogoSrc={require('../../assets/images/Carriya logo 1.png')} bottomLogoSrc={require('../../assets/images/Carriya logo 1.png')} onMenuClick={(key) => {
-				if (key === 'new-sellers') navigate('/admin/dashboard');
-				if (key === 'edit-content') navigate('/admin/edit-content');
-			}} />}
+				sidebar={
+					<AdminSidebar
+						topLogoSrc={require('../../assets/images/Carriya logo 1.png')}
+						activeKey="sellers"
+						onMenuClick={handleMenuClick}
+					/>
+				}
+				header={<AdminTopBar title="Seller Details" />}
 			>
-				<div className="px-4 md:px-6 pb-10">
-					{/* Breadcrumbs & pill are already represented in sidebar header; omit in content to fit width */}
+				<ConfirmModal
+					open={confirmSuspendOpen}
+					title="Suspend seller?"
+					message="Suspending will immediately log the seller out and archive their active listings. You can reactivate the seller later."
+					confirmText="Suspend seller"
+					cancelText="Cancel"
+					danger
+					loading={actionLoading === 'suspend'}
+					onConfirm={confirmSuspendSeller}
+					onClose={() => setConfirmSuspendOpen(false)}
+				/>
+				<div className="bg-white flex flex-col gap-6 px-4 sm:px-6 lg:px-8 py-6">
+					{/* Back Button */}
+					<button
+						onClick={() => navigate('/admin/sellers')}
+						className="flex items-center gap-2 text-[#6A7282] hover:text-[#2ECC71] transition-colors"
+						style={{ fontFamily: 'Arimo, sans-serif' }}
+					>
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+						</svg>
+						<span className="text-[14px]">Back to Sellers</span>
+					</button>
 
-					{/* Form area positioned coordinates */}
-					<div className="mt-8 md:px-0 px-3 md:mt-[40px] md:ml-[66px] md:mr-[40px] space-y-6 md:space-y-7">
-						{/* Row: First Name / Last Name */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-[48px]">
+					{/* Header Section */}
+					<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+						<div className="flex-1">
+							<h1
+								className="text-[24px] sm:text-[32px] font-bold text-[#101828] mb-2"
+								style={{ fontFamily: 'Arimo, sans-serif' }}
+							>
+								{seller.storeName}
+								
+							</h1>
+							
+							<p
+								className="text-[14px] sm:text-[16px] text-[#6A7282]"
+								style={{ fontFamily: 'Arimo, sans-serif' }}
+							>
+								Owner: {seller.ownerName}
+							</p>
+						</div>
+						<div>
+							<span
+								className={`inline-flex px-4 py-2 rounded-full text-[14px] font-medium ${getStatusBadgeStyle(seller.status)}`}
+								style={{ fontFamily: 'Arimo, sans-serif' }}
+							>
+								{seller.status}
+							</span>
+						</div>
+					</div>
+
+					{/* Action Buttons */}
+					<div className="flex flex-wrap gap-3">
+						{seller.status === 'Pending' && (
+							<button
+								onClick={handleApproveSeller}
+								disabled={actionLoading === 'approve'}
+								className="px-6 py-2.5 bg-[#2ECC71] text-white rounded-lg font-medium text-[14px] hover:bg-[#27AE60] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+								style={{ fontFamily: 'Arimo, sans-serif' }}
+							>
+								{actionLoading === 'approve' ? 'Approving...' : 'Approve Seller'}
+							</button>
+						)}
+						{seller.status !== 'Suspended' && (
+							<button
+								onClick={handleSuspendSeller}
+								disabled={actionLoading === 'suspend'}
+								className="px-6 py-2.5 bg-white border-2 border-[#FF0000] text-[#FF0000] rounded-lg font-medium text-[14px] hover:bg-[#FFF5F5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+								style={{ fontFamily: 'Arimo, sans-serif' }}
+							>
+								{actionLoading === 'suspend' ? 'Suspending...' : 'Suspend Seller'}
+							</button>
+						)}
+						{seller.status === 'Suspended' && (
+							<button
+								onClick={handleReactivateSeller}
+								disabled={actionLoading === 'reactivate'}
+								className="px-6 py-2.5 bg-[#2ECC71] text-white rounded-lg font-medium text-[14px] hover:bg-[#27AE60] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+								style={{ fontFamily: 'Arimo, sans-serif' }}
+							>
+								{actionLoading === 'reactivate' ? 'Reactivating...' : 'Reactivate Seller'}
+							</button>
+						)}
+						<button
+							onClick={() => navigate(`/admin/orders?sellerId=${encodeURIComponent(id || '')}`)}
+							disabled={!id}
+							className="px-6 py-2.5 bg-white border border-[#D1D5DC] text-[#364153] rounded-lg font-medium text-[14px] hover:bg-gray-50 transition-colors"
+							style={{ fontFamily: 'Arimo, sans-serif' }}
+						>
+							Manage Orders
+						</button>
+						<button
+							onClick={() => navigate(`/admin/payments?sellerId=${encodeURIComponent(id || '')}`)}
+							disabled={!id}
+							className="px-6 py-2.5 bg-white border border-[#D1D5DC] text-[#364153] rounded-lg font-medium text-[14px] hover:bg-gray-50 transition-colors"
+							style={{ fontFamily: 'Arimo, sans-serif' }}
+						>
+							Manage Payments
+						</button>
+					</div>
+
+					{/* Store & Owner Details Card */}
+					<div className="bg-white border border-[#E5E7EB] rounded-lg p-6 shadow-sm">
+						<h2
+							className="text-[18px] sm:text-[20px] font-bold text-[#101828] mb-6"
+							style={{ fontFamily: 'Arimo, sans-serif' }}
+						>
+							Store & Owner Details
+						</h2>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 							<div>
-								<Label>First Name</Label>
-                                <div className="mt-3 md:mt-[26px] h-[56px] md:h-[80px] w-full md:w-[338px]">
-									<InputCard className="h-full w-full" value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} placeholder="Enter first name" />
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Store Name
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.storeName}
+								</p>
+							</div>
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Owner Name
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.ownerName}
+								</p>
+							</div>
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Email
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.email}
+								</p>
+							</div>
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Contact Number
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.contactNumber}
+								</p>
+							</div>
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Seller Status
+								</p>
+								<span
+									className={`inline-flex px-3 py-1 rounded-full text-[14px] font-medium ${getStatusBadgeStyle(seller.status)}`}
+									style={{ fontFamily: 'Arimo, sans-serif' }}
+								>
+									{seller.status}
+								</span>
+							</div>
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Commission Percentage
+								</p>
+								<p className="text-[20px] sm:text-[24px] text-[#2ECC71] font-bold" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.commission}%
+								</p>
+							</div>
+						</div>
+					</div>
+
+					{/* Address Information Card */}
+					<div className="bg-white border border-[#E5E7EB] rounded-lg p-6 shadow-sm">
+						<h2
+							className="text-[18px] sm:text-[20px] font-bold text-[#101828] mb-6"
+							style={{ fontFamily: 'Arimo, sans-serif' }}
+						>
+							Address Information
+						</h2>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Pickup Address
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.pickupAddress}
+								</p>
+							</div>
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Return Address
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.returnAddress}
+								</p>
+							</div>
+						</div>
+					</div>
+
+					{/* Identity Verification Card */}
+					<div className="bg-white border border-[#E5E7EB] rounded-lg p-6 shadow-sm">
+						<h2
+							className="text-[18px] sm:text-[20px] font-bold text-[#101828] mb-6"
+							style={{ fontFamily: 'Arimo, sans-serif' }}
+						>
+							Identity Verification
+						</h2>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Name on ID Card
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.nameOnIdCard}
+								</p>
+							</div>
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									ID Card Number
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.idCardNumber}
+								</p>
+							</div>
+						</div>
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+							{/* ID Front */}
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-3" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									ID Card Front
+								</p>
+								<div
+									role="button"
+									tabIndex={0}
+									onClick={() => seller.idCardFrontUrl && window.open(seller.idCardFrontUrl, '_blank', 'noopener,noreferrer')}
+									onKeyDown={(e) => {
+										if ((e.key === 'Enter' || e.key === ' ') && seller.idCardFrontUrl) {
+											e.preventDefault();
+											window.open(seller.idCardFrontUrl, '_blank', 'noopener,noreferrer');
+										}
+									}}
+									className="relative border-2 border-dashed border-[#D1D5DC] rounded-lg bg-[#F9FAFB] hover:border-[#2ECC71] transition-colors cursor-pointer w-full aspect-[4/3] overflow-hidden"
+								>
+									{seller.idCardFrontUrl ? (
+										<img
+											src={seller.idCardFrontUrl}
+											alt="ID Card Front"
+											className="absolute inset-0 w-full h-full object-contain p-4"
+										/>
+									) : (
+										<div className="absolute inset-0 flex items-center justify-center text-[12px] text-[#9CA3AF]" style={{ fontFamily: 'Arimo, sans-serif' }}>
+											No document uploaded
+										</div>
+									)}
 								</div>
 							</div>
+
+							{/* ID Back */}
 							<div>
-								<Label>Last Name</Label>
-                                <div className="mt-3 md:mt-[26px] h-[56px] md:h-[80px] w-full md:w-[338px]">
-									<InputCard className="h-full w-full" value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} placeholder="Enter last name" />
+								<p className="text-[12px] text-[#6A7282] mb-3" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									ID Card Back
+								</p>
+								<div
+									role="button"
+									tabIndex={0}
+									onClick={() => seller.idCardBackUrl && window.open(seller.idCardBackUrl, '_blank', 'noopener,noreferrer')}
+									onKeyDown={(e) => {
+										if ((e.key === 'Enter' || e.key === ' ') && seller.idCardBackUrl) {
+											e.preventDefault();
+											window.open(seller.idCardBackUrl, '_blank', 'noopener,noreferrer');
+										}
+									}}
+									className="relative border-2 border-dashed border-[#D1D5DC] rounded-lg bg-[#F9FAFB] hover:border-[#2ECC71] transition-colors cursor-pointer w-full aspect-[4/3] overflow-hidden"
+								>
+									{seller.idCardBackUrl ? (
+										<img
+											src={seller.idCardBackUrl}
+											alt="ID Card Back"
+											className="absolute inset-0 w-full h-full object-contain p-4"
+										/>
+									) : (
+										<div className="absolute inset-0 flex items-center justify-center text-[12px] text-[#9CA3AF]" style={{ fontFamily: 'Arimo, sans-serif' }}>
+											No document uploaded
+										</div>
+									)}
 								</div>
 							</div>
-						</div>
 
-						{/* Row: Contact / Email */}
-                        <div className="mt-6 md:mt-[42px] grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-[70px]">
+						</div>
+					</div>
+
+					{/* Bank/Account Details Card */}
+					<div className="bg-white border border-[#E5E7EB] rounded-lg p-6 shadow-sm">
+						<h2
+							className="text-[18px] sm:text-[20px] font-bold text-[#101828] mb-6"
+							style={{ fontFamily: 'Arimo, sans-serif' }}
+						>
+							Bank / Account Details
+						</h2>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
 							<div>
-								<Label>Contact</Label>
-                                <div className="mt-3 md:mt-[26px] h-[56px] md:h-[80px] w-full md:w-[338px]">
-									<InputCard className="h-full w-full" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="Enter phone number" />
-								</div>
-							</div>
-							<div>
-								<Label>Email</Label>
-                                <div className="mt-3 md:mt-[26px] h-[56px] md:h-[80px] w-full md:w-[400px]">
-									<InputCard className="h-full w-full" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="Enter email" />
-								</div>
-							</div>
-						</div>
-
-						{/* Company Name */}
-                        <div className="mt-6 md:mt-[42px]">
-							<Label>Company Name</Label>
-                            <div className="mt-3 md:mt-[26px] h-[56px] md:h-[80px] w-full md:w-[338px]">
-								<InputCard className="h-full w-full" value={form.company} onChange={(v) => setForm({ ...form, company: v })} placeholder="Enter company name" />
-							</div>
-						</div>
-
-						{/* Addresses */}
-						<div className="mt-6 md:mt-[51px]">
-							<Label>Pick Up Address</Label>
-							<div className="mt-3 h-[56px] md:h-[80px] w-full md:w-[933px]">
-								<InputCard className="h-full w-full md:w-[830px]" value={form.pickupAddress} onChange={(v) => setForm({ ...form, pickupAddress: v })} placeholder="Enter pick up address" />
-							</div>
-						</div>
-						<div className="mt-6 md:mt-[51px]">
-							<Label>Return Address</Label>
-							<div className="mt-3 h-[56px] md:h-[80px] w-full md:w-[933px]">
-								<InputCard className="h-full w-full md:w-[830px]" value={form.returnAddress} onChange={(v) => setForm({ ...form, returnAddress: v })} placeholder="Enter return address" />
-							</div>
-						</div>
-
-						{/* ID and Verification */}
-                        <div className="mt-6 md:mt-[60px] grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-[50px]">
-							<div>
-								<Label>Name On ID Card</Label>
-                                <div className="mt-3 md:mt-[26px] h-[56px] md:h-[80px] w-full md:w-[441px]">
-									<InputCard className="h-full w-full md:w-[338px]" value={form.nameOnId} onChange={(v) => setForm({ ...form, nameOnId: v })} placeholder="Enter name on ID" />
-								</div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Account Holder Name
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.accountHolderName}
+								</p>
 							</div>
 							<div>
-								<Label>Id Card Number</Label>
-                                <div className="mt-3 md:mt-[26px] h-[56px] md:h-[80px] w-full md:w-[441px]">
-									<InputCard className="h-full w-full md:w-[400px]" value={form.idCardNumber} onChange={(v) => setForm({ ...form, idCardNumber: v })} placeholder="Enter ID card number" />
-								</div>
-							</div>
-						</div>
-
-					<div className="mt-6 md:mt-[26px] grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-[50px] md:gap-y-[20px]">
-							<div>
-								<Label>ID Card Front Pic</Label>
-							<div className="mt-3 md:mt-[26px]"><UploadCard label="Id card" /></div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									IBAN Number
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.ibanNumber}
+								</p>
 							</div>
 							<div>
-								<Label>ID Card Back Pic</Label>
-							<div className="mt-3 md:mt-[26px]"><UploadCard label="Id card" /></div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Account Number
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.accountNumber}
+								</p>
+							</div>
+							<div>
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Bank Name
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.bankName}
+								</p>
+							</div>
+							<div className="sm:col-span-2">
+								<p className="text-[12px] text-[#6A7282] mb-2" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									Branch Code
+								</p>
+								<p className="text-[14px] sm:text-[16px] text-[#101828] font-medium" style={{ fontFamily: 'Arimo, sans-serif' }}>
+									{seller.branchCode}
+								</p>
 							</div>
 						</div>
-
-						{/* Account Details */}
-						<div className="mt-6 md:mt-[59px]">
-							<Label>Account Details</Label>
-							<div className="mt-3 md:mt-[26px] space-y-3 md:space-y-[26px] w-full md:w-[933px]">
-								<InputCard className="h-[56px] md:h-[80px] w-full md:w-[830px]" value={form.nameOnId} onChange={(v) => setForm({ ...form, nameOnId: v })} placeholder="Enter account holder name" />
-								<InputCard className="h-[56px] md:h-[80px] w-full md:w-[830px]" value={form.iban} onChange={(v) => setForm({ ...form, iban: v })} placeholder="Enter IBAN" />
-								<InputCard className="h-[56px] md:h-[80px] w-full md:w-[830px]" value={form.accountNumber} onChange={(v) => setForm({ ...form, accountNumber: v })} placeholder="Enter account number" />
-								<InputCard className="h-[56px] md:h-[80px] w-full md:w-[830px]" value={form.bankName} onChange={(v) => setForm({ ...form, bankName: v })} placeholder="Enter bank name" />
-								<InputCard className="h-[56px] md:h-[80px] w-full md:w-[830px]" value={form.branchCode} onChange={(v) => setForm({ ...form, branchCode: v })} placeholder="Enter branch code" />
-							</div>
-						</div>
-
-						{/* Bank document */}
-						<div className="mt-6 md:mt-[51px]">
-							<Label>Bank Document pic</Label>
-						<div className="mt-3 md:mt-[26px]"><UploadCard label="Bank pic" /></div>
-						</div>
-
-						{/* Actions */}
-						<div className="mt-10 md:mt-[122px] flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-							<button onClick={() => navigate(-1)} className="text-[#2ECC71] font-medium text-[16px] md:text-[20px]">Back</button>
-							<div className="flex-1 md:flex-none">
-								<button className="w-full md:w-[354px] h-[48px] md:h-[63px] bg-[#FF0000] rounded-[12px] md:rounded-[25px] text-white font-semibold text-[18px] md:text-[35px]">Suspend</button>
+						<div>
+							<p className="text-[12px] text-[#6A7282] mb-3" style={{ fontFamily: 'Arimo, sans-serif' }}>
+								Bank Document Upload
+							</p>
+							<div
+								role="button"
+								tabIndex={0}
+								onClick={() => seller.bankDocumentUrl && window.open(seller.bankDocumentUrl, '_blank', 'noopener,noreferrer')}
+								onKeyDown={(e) => {
+									if ((e.key === 'Enter' || e.key === ' ') && seller.bankDocumentUrl) {
+										e.preventDefault();
+										window.open(seller.bankDocumentUrl, '_blank', 'noopener,noreferrer');
+									}
+								}}
+								className="relative border-2 border-dashed border-[#D1D5DC] rounded-lg bg-[#F9FAFB] hover:border-[#2ECC71] transition-colors cursor-pointer w-full max-w-md aspect-[4/3] overflow-hidden"
+							>
+								{seller.bankDocumentUrl ? (
+									<img
+										src={seller.bankDocumentUrl}
+										alt="Bank Document"
+										className="absolute inset-0 w-full h-full object-contain p-4"
+									/>
+								) : (
+									<div className="absolute inset-0 flex items-center justify-center text-[12px] text-[#9CA3AF]" style={{ fontFamily: 'Arimo, sans-serif' }}>
+										No document uploaded
+									</div>
+								)}
 							</div>
 						</div>
 					</div>
@@ -284,5 +624,3 @@ const SellerDetails: React.FC = () => {
 };
 
 export default SellerDetails;
-
-

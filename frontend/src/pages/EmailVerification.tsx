@@ -3,12 +3,57 @@ import { useNavigate } from 'react-router-dom';
 import signupImage from '../assets/images/auth/Rectangle 114.png';
 import logoImg from '../assets/images/Carriya logo 1.png';
 import Footer from '../components/Footer';
+import { upsertOnboarding } from '../services/onboardingService';
+import { useToast } from '../contexts/ToastContext';
 
 const EmailVerification: React.FC = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [userType, setUserType] = useState<'buyer' | 'seller'>('buyer');
   const [isLocked, setIsLocked] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '']);
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    password: '',
+    phone: '',
+  });
+  const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.VITE_API_URL) || 'http://localhost:4000';
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [resendSecondsLeft, setResendSecondsLeft] = useState(0);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const otpIsComplete = otp.join('').length === 5;
+  
+  // Email validation function
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Check if all required form fields are filled and email is valid
+  const isFormComplete = formData.firstName.trim() && 
+                        formData.lastName.trim() && 
+                        formData.password.trim() && 
+                        formData.phone.trim() && 
+                        email.trim() && 
+                        validateEmail(email);
+
+  useEffect(() => {
+    if (resendSecondsLeft <= 0) return;
+    const id = setInterval(() => {
+      setResendSecondsLeft((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [resendSecondsLeft]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleOtpChange = (index: number, value: string) => {
     if (value.length <= 1 && /^\d*$/.test(value)) {
@@ -24,6 +69,21 @@ const EmailVerification: React.FC = () => {
     }
   };
 
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const clip = e.clipboardData.getData('text');
+    const digits = (clip || '').replace(/\D/g, '').slice(0, 5).split('');
+    if (digits.length === 0) return;
+    const filled = [...otp];
+    for (let i = 0; i < 5; i++) {
+      filled[i] = digits[i] || '';
+    }
+    setOtp(filled);
+    const nextIndex = Math.min(digits.length, 4);
+    const nextInput = document.getElementById(`otp-${nextIndex}`);
+    nextInput?.focus();
+  };
+
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       const prevInput = document.getElementById(`otp-${index - 1}`);
@@ -31,13 +91,143 @@ const EmailVerification: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const otpCode = otp.join('');
-    if (otpCode.length === 5) {
-      // Handle verification logic here
-      console.log('Verification code:', otpCode);
-      // Navigate to next page or show success
+    if (otpCode.length !== 5) {
+      setVerificationError('Please enter the 5-digit code');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/email/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, code: otpCode }),
+      });
+      if (!res.ok) {
+        const maybeJson = await (async () => { try { return await res.json(); } catch { return null; } })();
+        const msg = (maybeJson && (maybeJson.error || maybeJson.message)) || '';
+        if (res.status === 409 || msg.toLowerCase().includes('already registered')) {
+          setVerificationSuccess(false);
+          setVerificationError('User Already Exists with this email..');
+          showToast({
+            type: 'error',
+            title: 'User Already Exists',
+            message: 'This email is already registered. Please login.',
+          });
+          return;
+        }
+        setVerificationSuccess(false);
+        setVerificationError('Invalid or expired code');
+        // Reset OTP inputs when code is incorrect
+        setOtp(['', '', '', '', '']);
+        setTimeout(() => {
+          const firstInput = document.getElementById('otp-0');
+          firstInput?.focus();
+        }, 100);
+        return;
+      }
+      setVerificationError(null);
+      setVerificationSuccess(true);
+      try { localStorage.setItem('verifiedEmail', email || ''); } catch {}
+
+      // Persist email into onboarding so login by email+password works later
+      const phone = localStorage.getItem('verifiedPhone') || localStorage.getItem('seller_phone_tmp') || '';
+      if (phone) {
+        try {
+          await upsertOnboarding({ phone, email });
+          setFieldErrors({});
+        } catch (err: any) {
+          const errs = err?.response?.data?.fieldErrors || {};
+          setFieldErrors(errs);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setVerificationSuccess(false);
+      setVerificationError('Invalid or expired code');
+      // Reset OTP inputs when code is incorrect
+      setOtp(['', '', '', '', '']);
+      setTimeout(() => {
+        const firstInput = document.getElementById('otp-0');
+        firstInput?.focus();
+      }, 100);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendSecondsLeft > 0) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/email/request-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const maybeJson = await (async () => { try { return await res.json(); } catch { return null; } })();
+        const msg = (maybeJson && (maybeJson.error || maybeJson.message)) || '';
+        if (res.status === 409 || msg.toLowerCase().includes('already registered')) {
+          setVerificationError('This email is already registered. Please login.');
+          setVerificationSuccess(false);
+          showToast({
+            type: 'error',
+            title: 'Email Already Registered',
+            message: 'This email is already registered. Please login.',
+          });
+          return;
+        }
+        throw new Error('Failed to resend');
+      }
+      setVerificationError(null);
+      setVerificationSuccess(false);
+      setResendSecondsLeft(60);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    // Validate email format before proceeding
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/email/request-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const maybeJson = await (async () => { try { return await res.json(); } catch { return null; } })();
+        const msg = (maybeJson && (maybeJson.error || maybeJson.message)) || '';
+        if (res.status === 409 || msg.toLowerCase().includes('already registered')) {
+          setVerificationError('This email is already registered. Please login.');
+          setVerificationSuccess(false);
+          showToast({
+            type: 'error',
+            title: 'User Already Exists',
+            message: 'This email is already registered. Please login.',
+          });
+          return;
+        }
+        throw new Error('Failed to send verification email');
+      }
+      setVerificationError(null);
+      setVerificationSuccess(false);
+      setResendSecondsLeft(60);
+    } catch (e) {
+      console.error('Error sending verification email:', e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,6 +314,9 @@ const EmailVerification: React.FC = () => {
                     <div className="relative">
                       <input
                         type="text"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
                         placeholder="First Name"
                         className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] placeholder-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)]"
                         required
@@ -134,6 +327,9 @@ const EmailVerification: React.FC = () => {
                     <div className="relative">
                       <input
                         type="text"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
                         placeholder="Last Name"
                         className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] placeholder-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)]"
                         required
@@ -146,16 +342,37 @@ const EmailVerification: React.FC = () => {
                 <div>
                   <input
                     type="email"
+                    value={email}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setEmail(value);
+                      
+                      // Validate email in real-time
+                      if (value.trim() && !validateEmail(value)) {
+                        setEmailError('Please enter a valid email address');
+                      } else {
+                        setEmailError('');
+                      }
+                    }}
                     placeholder="Enter Email"
                     className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] placeholder-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)]"
                     required
                   />
+                  {emailError && (
+                    <div className="text-red-500 text-[10px] md:text-[14px] mt-1">{emailError}</div>
+                  )}
+                  {fieldErrors.email ? (
+                    <div className="text-red-500 text-[10px] md:text-[14px] mt-1">{fieldErrors.email}</div>
+                  ) : null}
                 </div>
 
                 {/* Password Field */}
                 <div>
                   <input
                     type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
                     placeholder="Password"
                     className="w-full h-[38px] md:h-[67px] px-[18px] md:px-[29px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] placeholder-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)]"
                     required
@@ -175,6 +392,9 @@ const EmailVerification: React.FC = () => {
                   <div className="flex-1">
                     <input
                       type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
                       placeholder="321 123456"
                       className="w-full h-[38px] md:h-[67px] px-[15px] md:px-[21px] border border-[#B8B1B1] rounded-[10px] md:rounded-[15px] text-[12px] md:text-[25px] text-[#B8B1B1] placeholder-[#B8B1B1] focus:outline-none focus:border-[#2ECC71] shadow-[1px_2px_4px_rgba(233,255,242,1)]"
                       required
@@ -199,7 +419,13 @@ const EmailVerification: React.FC = () => {
                 <div className="mb-6 md:mb-[107px] flex justify-center">
                   <button
                     type="button"
-                    className="w-[352px] md:w-[500px] h-[29px] md:h-[48px] bg-[#2ECC71] text-white rounded-[45px] text-[15px] md:text-[25px] font-normal hover:bg-[#27AE60] transition-colors flex items-center justify-center gap-3"
+                    onClick={handleVerifyEmail}
+                    disabled={!isFormComplete || isLoading}
+                    className={`w-[352px] md:w-[500px] h-[29px] md:h-[48px] rounded-[45px] text-[15px] md:text-[25px] font-normal transition-colors flex items-center justify-center gap-3 ${
+                      isFormComplete && !isLoading
+                        ? 'bg-[#2ECC71] text-white hover:bg-[#27AE60]'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                   >
                     <svg className="w-4 h-4 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none">
                       <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
@@ -218,6 +444,7 @@ const EmailVerification: React.FC = () => {
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
+                      onPaste={handleOtpPaste}
                       className="w-[27px] h-[27px] md:w-[41px] md:h-[41px] text-center border border-[#949494] rounded text-[15px] md:text-[25px] font-medium focus:outline-none focus:border-[#2ECC71]"
                       maxLength={1}
                     />
@@ -235,18 +462,41 @@ const EmailVerification: React.FC = () => {
                 <div className="flex items-center justify-center gap-4 md:gap-[26px] py-2 md:py-5">
                   <button
                     type="submit"
-                    className="w-[86.8px] h-[29px] md:w-[129px] md:h-[48px] bg-[#2ECC71] text-white rounded-[45px] text-[15px] md:text-[25px] font-normal hover:bg-[#27AE60] transition-colors flex items-center justify-center"
+                    disabled={!otpIsComplete || isLoading}
+                    className={`w-[86.8px] h-[29px] md:w-[129px] md:h-[48px] rounded-[45px] text-[15px] md:text-[25px] font-normal transition-colors flex items-center justify-center ${
+                      otpIsComplete && !isLoading
+                        ? 'bg-[#2ECC71] text-white hover:bg-[#27AE60]'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                   >
-                    Verify
+                    {isLoading ? 'Verifying...' : 'Verify'}
                   </button>
                   
                   <button
                     type="button"
-                    className="text-[10px] md:text-[15px] font-light text-[#767676] underline hover:no-underline"
+                    onClick={handleResend}
+                    disabled={resendSecondsLeft > 0}
+                    className="text-[10px] md:text-[15px] font-light text-[#767676] underline hover:no-underline disabled:opacity-50"
                   >
-                    Resend Code try after 60s
+                    {resendSecondsLeft > 0 ? `Resend Code try after ${resendSecondsLeft}s` : 'Resend Code'}
                   </button>
                 </div>
+
+                {verificationSuccess && (
+                  <div className="flex justify-center py-2">
+                    <div className="bg-green-100 text-green-800 border border-green-300 rounded px-4 py-2 text-[12px] md:text-[16px]">
+                      Your email has been verified.
+                    </div>
+                  </div>
+                )}
+
+                {verificationError && (
+                  <div className="flex justify-center py-2">
+                    <div className="bg-red-100 text-red-800 border border-red-300 rounded px-4 py-2 text-[12px] md:text-[16px]">
+                      {verificationError}
+                    </div>
+                  </div>
+                )}
 
                 {/* Or continue with + Google (mobile) */}
                 <div className="md:hidden mt-6">

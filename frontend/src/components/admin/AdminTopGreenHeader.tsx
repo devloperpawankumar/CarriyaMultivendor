@@ -2,9 +2,10 @@ import React from 'react';
 
 const AdminTopGreenHeader: React.FC = () => {
 	return (
-		<div className="w-full flex items-center justify-center md:h-[64px] h-[38px]" style={{ backgroundColor: '#2ECC71' }}>
-			<span className="text-white md:text-[25px] text-[14px]" style={{ fontFamily: 'Roboto', fontWeight: 600 }}>
-				Carryia Admin Panel
+		// Hide on mobile (lg:flex), show only on desktop
+		<div className="hidden lg:flex w-full items-center justify-center h-[64px]" style={{ backgroundColor: '#2ECC71' }}>
+			<span className="text-white text-[25px]" style={{ fontFamily: 'Roboto', fontWeight: 600 }}>
+				Carriya Admin Panel
 			</span>
 		</div>
 	);

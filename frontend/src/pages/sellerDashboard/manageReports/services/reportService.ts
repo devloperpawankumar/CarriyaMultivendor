@@ -1,13 +1,23 @@
+import api from '../../../../services/api';
 import { ReportsResponse } from '../types/reportTypes';
-import { mockReports } from '../mockData';
 
-// Backend-friendly service facade. Replace internals with real API calls.
-
+// Backend-friendly service facade with real API integration only (no mock fallback)
 export async function fetchReports(dateRange?: string): Promise<ReportsResponse> {
-  // Example: const res = await fetch(`/api/seller/reports?range=${dateRange ?? '30d'}`);
-  // return res.json();
-  return Promise.resolve(mockReports);
+  const rangeMap: Record<string, string> = {
+    Today: 'today',
+    Yesterday: 'yesterday',
+    'Last 7 Days': '7d',
+    'Last 30 Days': '30d',
+    'This Month': 'month',
+  };
+
+  const backendRange = rangeMap[dateRange || 'Last 30 Days'] || '30d';
+  const response = await api.get<ReportsResponse>(`/api/seller/reports?range=${backendRange}`);
+
+  if (response && typeof response === 'object') {
+    return response;
+  }
+
+  throw new Error('Invalid reports response format');
 }
-
-
 

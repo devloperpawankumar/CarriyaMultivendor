@@ -9,7 +9,6 @@ import InfoPanel from '../components/product/InfoPanel';
 import Gallery from '../components/product/Gallery';
 import DescriptionBlock from '../components/product/DescriptionBlock';
 import ReviewsBlock from '../components/product/ReviewsBlock';
-import AddToCartOverlay from '../components/product/AddToCartOverlay';
 import { useNavigate } from 'react-router-dom';
 import Stars from '../components/product/Stars';
 import saleIcon from '../assets/images/Icon (Stroke).png';
@@ -17,52 +16,28 @@ import cartIcon from '../assets/images/Cart.png';
 import { useCart } from '../contexts/CartContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useClickOutside } from '../hooks/useClickOutside';
+import { useToast } from '../contexts/ToastContext';
+import { commonToasts } from '../utils/toast';
+import { getProduct, ProductDetail as ApiProductDetail } from '../services/productService';
+import { getProductReviews, ProductReview } from '../services/reviewService';
 
-// Dummy data builder
-function useDummyProduct(id: string) {
-  return useMemo(() => ({
-    id,
-    category: 'Shirt',
-    title: 'Cotton Shirt Black',
-    price: 1200,
-    compareAt: 2000,
-    currency: 'PKR',
-    sales: 2200,
-    rating: 5,
-    reviews: 10,
-    colors: ['Pink', 'Blue', 'Yellow'],
-    sizes: ['S', 'M', 'L', 'XL'],
-    images: [productImage, productImage, productImage, productImage],
-    description: `This is a captivating fragrance that combines freshness, elegance, and warmth in perfect harmony. With a delicate blend of floral and woody notes, it leaves a long-lasting impression that is both refined and unforgettable. Designed for any occasion, this perfume adds a touch of sophistication to your everyday moments or special evenings.`,
-    reviewsList: [
-      { 
-        user: 'Huzaifa', 
-        rating: 5, 
-        text: `I've been using this cleanser for about five or six months now and my acne is almost completely gone. I really struggled for years with my skin and tried everything possible but this is the only thing that managed to clear up my skin. 100% recommend and will continue to use is for sure.` 
-      },
-      { 
-        user: 'Pawan', 
-        rating: 4, 
-        text: `I've been using this cleanser for about five or six months now and my acne is almost completely gone. I really struggled for years with my skin and tried everything possible but this is the only thing that managed to clear up my skin. 100% recommend and will continue to use is for sure.` 
-      },
-      { 
-        user: 'Ahmed', 
-        rating: 5, 
-        text: `I've been using this cleanser for about five or six months now and my acne is almost completely gone. I really struggled for years with my skin and tried everything possible but this is the only thing that managed to clear up my skin. 100% recommend and will continue to use is for sure.` 
-      },
-    ],
-  }), [id]);
-}
+// (Replaced dummy data with real API fetch)
 
 
 const ProductDetail: React.FC = () => {
-  const { productId = '1' } = useParams();
-  const product = useDummyProduct(productId);
+  const { productSlug = '' } = useParams<{ productSlug: string }>();
+  const [product, setProduct] = useState<ApiProductDetail | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState<boolean>(false);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
+  const [totalReviewsCount, setTotalReviewsCount] = useState<number>(0);
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { items: favoriteItems, toggle: toggleFavorite } = useFavorites();
-  const isFavorite = useMemo(() => favoriteItems.some(i => i.id === product.id), [favoriteItems, product.id]);
-  const [showAddToast, setShowAddToast] = useState(false);
+  const { showToast } = useToast();
+  const isFavorite = useMemo(() => favoriteItems.some(i => i.id === product?.id), [favoriteItems, product?.id]);
   const [showCategories, setShowCategories] = useState(false);
   const browseButtonRef = useRef<HTMLButtonElement | null>(null);
   const categoriesDropdownRef = useRef<HTMLDivElement | null>(null);
@@ -72,6 +47,7 @@ const ProductDetail: React.FC = () => {
   const [mobileSelectedSize, setMobileSelectedSize] = useState<string | undefined>(undefined);
   const [mobileColorOpen, setMobileColorOpen] = useState(false);
   const [mobileSizeOpen, setMobileSizeOpen] = useState(false);
+  const sellerStoreName = product?.storeName || product?.sellerName || 'Seller Store';
 
   // Ensure page starts at top when navigating to a product
   useEffect(() => {
@@ -80,7 +56,110 @@ const ProductDetail: React.FC = () => {
     } catch {
       // noop
     }
-  }, [productId]);
+  }, [productSlug]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    if (!productSlug) {
+      setProduct(null);
+      setError('Product not found');
+      setLoading(false);
+      setReviewsLoading(false);
+      return () => {
+        mounted = false;
+      };
+    }
+
+    setLoading(true);
+    setReviewsLoading(true);
+    setError(null);
+    setReviewsError(null);
+    
+    // Load product and reviews in parallel for better performance
+    (async () => {
+      try {
+        // Start both requests in parallel
+        const productPromise = getProduct(productSlug);
+        
+        // We need product ID first to fetch reviews, so we'll do it in two steps:
+        // 1. Get product
+        // 2. Once we have product ID, fetch reviews immediately
+        const productData = await productPromise;
+        
+        if (!mounted) return;
+        
+        // Set product data immediately
+        setProduct(productData);
+        setMobileSelectedColor(productData.colors?.[0]?.name || undefined);
+        setMobileSelectedSize(productData.sizes?.[0] || undefined);
+        // Use id (which is the slug) for URL redirect if needed
+        if (productData.id && productData.id !== productSlug) {
+          window.history.replaceState(null, '', `/product/${productData.id}`);
+        }
+        
+        // Now fetch reviews immediately after product is loaded (still in same effect)
+        // This ensures they load together and appear together
+        if (productData.id) {
+          try {
+            const reviewsResponse = await getProductReviews(productData.id, { page: 1, limit: 10 });
+            if (mounted) {
+              setReviews(reviewsResponse.reviews || []);
+              setTotalReviewsCount(reviewsResponse.pagination?.total || 0);
+            }
+          } catch (reviewsErr: any) {
+            if (mounted) {
+              // Don't show error if it's just that there are no reviews (404 or empty)
+              const status = reviewsErr?.response?.status;
+              if (status === 404) {
+                // Product not found or no reviews - treat as empty, not error
+                setReviewsError(null);
+                setReviews([]);
+                setTotalReviewsCount(0);
+              } else {
+                setReviewsError('Failed to load reviews. Please try again later.');
+                console.error('Failed to load reviews:', reviewsErr);
+              }
+            }
+          } finally {
+            if (mounted) {
+              setReviewsLoading(false);
+            }
+          }
+        } else {
+          if (mounted) {
+            setReviewsLoading(false);
+          }
+        }
+      } catch {
+          if (mounted) {
+          setError('Failed to load product');
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    })();
+    
+    return () => { 
+      mounted = false; 
+    };
+  }, [productSlug]);
+
+  // Use product's reviewCount and rating (source of truth from database)
+  // This is updated automatically when reviews are submitted (backend updates product.rating and product.reviewCount)
+  // Similar to how Amazon/Daraz work - they show total count from product, not just fetched reviews
+  // We use product.reviewCount as the source of truth to match ProductCard display
+  const reviewStats = useMemo(() => {
+    // Always use product's reviewCount (source of truth, matches ProductCard)
+    // This ensures consistency across all product displays
+    const count = product?.reviewCount || 0;
+    return {
+      count,
+      rating: product?.rating || 0,
+    };
+  }, [product?.reviewCount, product?.rating]);
 
   useClickOutside(() => setShowCategories(false), {
     enabled: showCategories,
@@ -96,6 +175,14 @@ const ProductDetail: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6">
         {/* Browse Categories: Desktop text link; Mobile hamburger only */}
         
+        {loading && (
+          <div className="py-12 text-center text-[#424551]">Loading product...</div>
+        )}
+        {error && !loading && (
+          <div className="py-12 text-center text-red-600">{error}</div>
+        )}
+        {!loading && !error && product && (
+        <>
         <div className="relative mb-4 flex items-center">
           {/* Desktop: keep current styling */}
           <button
@@ -124,7 +211,7 @@ const ProductDetail: React.FC = () => {
         {/* Page heading: category, title, divider (desktop only) */}
         <div className="mb-6 hidden md:block">
           <div className="text-[35px] font-medium leading-[1.17] mb-1">
-            <span className="text-black  cursor-pointer">{(product as any).category}</span>
+            <span className="text-black  cursor-pointer">{product.categoryPath || 'Product'}</span>
           </div>
           <h1
             className="text-[46px] font-bold text-[#2ECC71] leading-[1.3] mb-4 cursor-default"
@@ -136,33 +223,72 @@ const ProductDetail: React.FC = () => {
 
         {/* Two-column: left gallery, right details (desktop only for right panel) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Gallery images={product.images} />
+          <Gallery images={(product.images && product.images.length ? product.images : [productImage])} />
           <div className="hidden md:block">
             <InfoPanel
-            price={product.price}
-            compareAt={product.compareAt}
-            currency={product.currency}
-            sales={product.sales}
-            rating={product.rating}
-            reviews={product.reviews}
-            colors={product.colors}
+            price={product.currentPrice ?? product.price}
+            compareAt={product.originalPrice ?? product.price}
+            currency={'PKR'}
+            sales={product.salesCount ?? 0}
+            rating={reviewStats.rating}
+            reviews={reviewStats.count}
+            colors={(product.colors || []).map(c => c.name)}
+            colorsWithHex={product.colors || []}
             sizes={product.sizes}
             productId={product.id}
             productTitle={product.title}
-            productImage={product.images[0]}
-            onAddToCart={(d) => { 
-              addItem({
-                title: product.title,
-                image: product.images[0],
-                price: product.price,
-                compareAt: product.compareAt,
-                color: d.color,
-                size: d.size,
-                qty: d.quantity,
-                shopName: 'My Shop'
-              });
-              setCartDetails(d); 
-              setShowAddToast(true); 
+            productImage={(product.images && product.images[0]) || productImage}
+            sellerId={product.sellerId}
+            sellerSlug={product.sellerSlug}
+            onAddToCart={async (d) => { 
+              try {
+                await addItem({
+                  productId: product.id,
+                  sellerId: product.sellerId,
+                  title: product.title,
+                  image: (product.images && product.images[0]) || productImage,
+                  price: product.currentPrice ?? product.price,
+                  compareAt: product.originalPrice ?? product.price,
+                  color: d.color,
+                  size: d.size,
+                  qty: d.quantity,
+                  shopName: sellerStoreName
+                });
+                setCartDetails(d); 
+                showToast(commonToasts.addedToCart()); 
+              } catch (error: any) {
+                // Extract backend error message
+                const backendMessage = error?.response?.data?.error || 
+                                      error?.response?.data?.message || 
+                                      error?.message || 
+                                      'Failed to add item to cart. Please try again.';
+                const lowerMessage = backendMessage.toLowerCase();
+                
+                // Stock-related issues should be warnings (informational), not errors (Amazon/Daraz style)
+                if (lowerMessage.includes('insufficient stock') || 
+                    lowerMessage.includes('stock') || 
+                    lowerMessage.includes('available')) {
+                  showToast({ 
+                    type: 'warning', 
+                    title: 'Stock Limit', 
+                    message: backendMessage 
+                  });
+                } else if (lowerMessage.includes('not available') || 
+                           lowerMessage.includes('unavailable')) {
+                  showToast({ 
+                    type: 'warning', 
+                    title: 'Product Unavailable', 
+                    message: backendMessage 
+                  });
+                } else {
+                  // Real errors (network issues, server errors, etc.)
+                  showToast({ 
+                    type: 'error', 
+                    title: 'Error', 
+                    message: backendMessage 
+                  });
+                }
+              }
             }}
             />
           </div>
@@ -183,34 +309,28 @@ const ProductDetail: React.FC = () => {
       {/* Label */}
 
     {/* Color buttons */}
-    {product.colors.slice(0, 3).map((c: string) => (
-      <button
-        key={c}
-        onClick={() => setMobileSelectedColor(c)}
-        aria-label={c}
-        className={`w-5 h-5 rounded-full border ${
-          (mobileSelectedColor ?? product.colors[0]) === c
-            ? 'border-[#2ECC71]'
-            : 'border-[#D7DADD]'
-        }`}
-        style={{
-          backgroundColor:
-            c.toLowerCase() === 'pink'
-              ? '#FFB6C1'
-              : c.toLowerCase() === 'blue'
-              ? '#C0DDED'
-              : c.toLowerCase() === 'yellow'
-              ? '#FEDE41'
-              : c.toLowerCase() === 'black'
-              ? '#000'
-              : '#eee',
-        }}
-      />
-    ))}
+    {(product.colors || []).slice(0, 3).map((c) => {
+      const colorName = c.name || 'Unknown';
+      const colorHex = c.hex || '#eee';
+      return (
+        <button
+          key={colorName}
+          onClick={() => setMobileSelectedColor(colorName)}
+          aria-label={colorName}
+          className={`w-5 h-5 rounded-full border ${
+            (mobileSelectedColor ?? product.colors?.[0]?.name) === colorName
+              ? 'border-[#2ECC71]'
+              : 'border-[#D7DADD]'
+          }`}
+          style={{ backgroundColor: colorHex }}
+          title={colorName}
+        />
+      );
+    })}
 
     {/* Selected color text */}
     <span className="ml-2 text-sm text-gray-700">
-      {mobileSelectedColor ?? product.colors[0]}
+      {mobileSelectedColor ?? product.colors?.[0]?.name}
     </span>
   </div>
 </div>
@@ -226,7 +346,7 @@ const ProductDetail: React.FC = () => {
             <button
               type="button"
               aria-label="Toggle favorite"
-              onClick={() => toggleFavorite({ id: product.id, title: product.title, image: product.images[0] })}
+              onClick={() => toggleFavorite({ id: product.id, title: product.title, image: (product.images && product.images[0]) || productImage })}
               className={`h-10 w-7 flex items-center justify-center`}
             >
               <svg
@@ -250,14 +370,14 @@ const ProductDetail: React.FC = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1">
                 <img src={saleIcon} alt="sales" className="w-4 h-4" />
-                <span className="text-[12px] text-[#949494]">{product.sales.toLocaleString()} Sales</span>
+                <span className="text-[12px] text-[#949494]">{(product.salesCount ?? 0).toLocaleString()} Sales</span>
               </div>
               <div className="flex items-center gap-1">
-                <Stars rating={(product as any).rating} size="sm" />
-                <span className="text-[12px] text-[#949494]">({(product as any).reviews})</span>
+                <Stars rating={reviewStats.rating} size="sm" />
+                <span className="text-[12px] text-[#949494]">({reviewStats.count})</span>
               </div>
             </div>
-            <div className="text-[20px] font-bold text-black">{product.currency} {product.price}</div>
+            <div className="text-[20px] font-bold text-black">PKR {product.currentPrice ?? product.price}</div>
           </div>
 
           {/* Description */}
@@ -279,12 +399,12 @@ const ProductDetail: React.FC = () => {
             </button>
             {mobileSizeOpen && (
               <div className="px-4 pb-2">
-                {product.sizes.map((s: string) => (
+                {(product.sizes || []).map((s: string) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => { setMobileSelectedSize(s); /* Do not close dropdown */ }}
-                    className={`w-full text-left py-2 text-[16px] ${((mobileSelectedSize ?? product.sizes[0]) === s) ? 'font-bold text-[#2ECC71]' : 'text-[#424551]'}`}
+                    className={`w-full text-left py-2 text-[16px] ${((mobileSelectedSize ?? product.sizes?.[0]) === s) ? 'font-bold text-[#2ECC71]' : 'text-[#424551]'}`}
                   >
                     {s}
                   </button>
@@ -307,16 +427,20 @@ const ProductDetail: React.FC = () => {
             </button>
             {mobileColorOpen && (
               <div className="px-4 pb-2">
-                {product.colors.map((c: string) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => { setMobileSelectedColor(c); /* Do not close dropdown */ }}
-                    className={`w-full text-left py-2 text-[16px] ${((mobileSelectedColor ?? product.colors[0]) === c) ? 'font-bold text-[#2ECC71]' : 'text-[#424551]'}`}
-                  >
-                    {c}
-                  </button>
-                ))}
+                {(product.colors || []).map((c) => {
+                  const colorName = c.name || 'Unknown';
+                  return (
+                    <button
+                      key={colorName}
+                      type="button"
+                      onClick={() => { setMobileSelectedColor(colorName); /* Do not close dropdown */ }}
+                      className={`w-full text-left py-2 text-[16px] flex items-center gap-2 ${((mobileSelectedColor ?? product.colors?.[0]?.name) === colorName) ? 'font-bold text-[#2ECC71]' : 'text-[#424551]'}`}
+                    >
+                      <span className="w-4 h-4 rounded-full border border-gray-300" style={{ backgroundColor: c.hex || '#eee' }} />
+                      <span>{colorName}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -348,18 +472,29 @@ const ProductDetail: React.FC = () => {
               <div className="flex justify-end">
               <button 
                 className=" flext-0.5 h-11 bg-[#2ECC71]  text-white rounded-[10px] font-medium flex items-center justify-end gap-2 px-4" 
-                onClick={() => {
-                  addItem({
-                    title: product.title,
-                    image: product.images[0],
-                    price: product.price,
-                    compareAt: product.compareAt,
-                    color: mobileSelectedColor,
-                    size: mobileSelectedSize,
-                    qty: mobileQuantity,
-                    shopName: 'My Shop'
-                  });
-                  setShowAddToast(true);
+                onClick={async () => {
+                  try {
+                    await addItem({
+                      productId: product.id,
+                      sellerId: product.sellerId,
+                      title: product.title,
+                      image: (product.images && product.images[0]) || productImage,
+                      price: product.currentPrice ?? product.price,
+                      compareAt: product.originalPrice,
+                      color: mobileSelectedColor,
+                      size: mobileSelectedSize,
+                      qty: mobileQuantity,
+                      shopName: sellerStoreName
+                    });
+                    showToast(commonToasts.addedToCart());
+                  } catch (error: any) {
+                    // Extract backend error message
+                    const backendMessage = error?.response?.data?.error || 
+                                          error?.response?.data?.message || 
+                                          error?.message || 
+                                          'Failed to add item to cart. Please try again.';
+                    showToast({ type: 'error', title: 'Error', message: backendMessage });
+                  }
                 }}
               >
                 <span>Add to cart</span>
@@ -373,7 +508,14 @@ const ProductDetail: React.FC = () => {
 <div className="flex justify-end">
   <button
     className="px-4 w-1/2 h-11 bg-[#2ECC71] text-white rounded-[10px] font-medium mt-1"
-    onClick={() => navigate('/sellerstore')}
+    onClick={() => {
+      const target = product.sellerSlug
+        ? `/seller/${product.sellerSlug}`
+        : product.sellerId
+        ? `/seller/${product.sellerId}`
+        : null;
+      if (target) navigate(target);
+    }}
   >
     Go to Seller store
   </button>
@@ -382,8 +524,16 @@ const ProductDetail: React.FC = () => {
 
             {/* Mobile Reviews placed after actions   */}
             <div className="mt-6">
-              <h2 className="text-[24px] font-bold text-black mb-3">Reviews</h2>
-              <ReviewsBlock items={product.reviewsList} />
+              <ReviewsBlock 
+                items={reviews.map((r) => ({
+                  user: r.buyer.name || 'Anonymous',
+                  rating: r.productRating,
+                  text: r.productReview || 'No review text provided.',
+                }))}
+                loading={reviewsLoading}
+                error={reviewsError}
+                showTitle={false}
+              />
             </div>
           </div>
         </div>
@@ -394,10 +544,19 @@ const ProductDetail: React.FC = () => {
           {/* Below: left description, right reviews (desktop only) */}
         <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-8">
           <DescriptionBlock text={product.description} />
-          <ReviewsBlock items={product.reviewsList} />
+          <ReviewsBlock 
+            items={reviews.map((r) => ({
+              user: r.buyer.name || 'Anonymous',
+              rating: r.productRating,
+              text: r.productReview || 'No review text provided.',
+            }))}
+            loading={reviewsLoading}
+            error={reviewsError}
+          />
         </div>
 
-        <AddToCartOverlay open={showAddToast} onClose={() => setShowAddToast(false)} message="Product has been added to the cart" onViewCart={() => navigate('/cart')} />
+        </>
+        )}
       </main>
 
       <Footer />

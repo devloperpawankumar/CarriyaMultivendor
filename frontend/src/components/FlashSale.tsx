@@ -1,211 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
-import product1 from "../assets/images/Product/prodcut1.png";
+import { fetchPublicProducts, PublicProductListItem } from '../services/productService';
+import SkeletonProductCard from './common/SkeletonProductCard';
 
 
 const FlashSale: React.FC = () => {
-  const flashSaleProducts = [
-    {
-      id: 1,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 2,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 3,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 4,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 5,
-      name: "Write The Name Of Product Here",
-      price: 700,
-      originalPrice: 1750,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 6,
-      name: "Write The Name Of Product Here",
-      price: 700,
-      originalPrice: 1750,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 7,
-      name: "Write The Name Of Product Here",
-      price: 1200,
-      originalPrice: 3000,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 8,
-      name: "Write The Name Of Product Here",
-      price: 1000,
-      originalPrice: 2500,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 9,
-      name: "Write The Name Of Product Here",
-      price: 1000,
-      originalPrice: 2500,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 10,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 11,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 12,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 13,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 14,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 15,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 16,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 17,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 18,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 19,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    },
-    {
-      id: 20,
-      name: "Write The Name Of Product Here",
-      price: 500,
-      originalPrice: 1250,
-      discount: 60,
-      rating: 5,
-      reviews: 25,
-      image: product1
-    }
-  ];
+  const [items, setItems] = useState<PublicProductListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        // Fetch popular products; prefer discounted ones for "Flash Sale"
+        const data = await fetchPublicProducts({ page: 1, pageSize: 24, sort: 'popular' });
+        const discounted = data.items.filter((p) => p.discount > 0);
+        const pool = discounted.length >= 8 ? discounted : data.items;
+        // Cap max 2 items per seller
+        const perSellerCount: Record<string, number> = {};
+        const capped: PublicProductListItem[] = [];
+        for (const p of pool) {
+          const sid = p.sellerId || `unknown-${p.id}`;
+          const count = perSellerCount[sid] || 0;
+          if (count < 2) {
+            capped.push(p);
+            perSellerCount[sid] = count + 1;
+          }
+          if (capped.length >= 12) break;
+        }
+        if (mounted) setItems(capped);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <section className="w-full bg-white py-8">
@@ -215,11 +44,32 @@ const FlashSale: React.FC = () => {
       </h2>
   
       {/* 3 per row on mobile, 4 on desktop */}
-      <div className="grid grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6">
-        {flashSaleProducts.map((product) => (
-          <ProductCard key={product.id} {...product} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <SkeletonProductCard key={i} compact />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <div className="text-sm text-gray-500">No deals right now.</div>
+      ) : (
+        <div className="grid grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6">
+          {items.map((p) => (
+            <ProductCard
+              key={p.id}
+              id={p.id}
+              slug={p.id}
+              name={p.title}
+              price={p.currentPrice}
+              originalPrice={p.discount > 0 ? p.price : undefined}
+              discount={p.discount}
+              rating={p.rating || 0}
+              reviews={p.reviewCount || 0}
+              image={p.thumbnailUrl || ''}
+            />
+          ))}
+        </div>
+      )}
 
 
 

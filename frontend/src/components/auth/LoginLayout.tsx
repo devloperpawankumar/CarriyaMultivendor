@@ -8,6 +8,7 @@ export interface LoginLayoutProps {
   imageAlt: string;
   className?: string;
   imageHeight?: 'default' | 'tall';
+  onSignupClick?: () => void;
 }
 
 const LoginLayout: React.FC<LoginLayoutProps> = ({
@@ -15,7 +16,8 @@ const LoginLayout: React.FC<LoginLayoutProps> = ({
   imageSrc,
   imageAlt,
   className = '',
-  imageHeight = 'default'
+  imageHeight = 'default',
+  onSignupClick,
 }) => {
   return (
     <div className={`min-h-screen bg-white ${className}`}>
@@ -40,7 +42,13 @@ const LoginLayout: React.FC<LoginLayoutProps> = ({
           <div className="flex items-center gap-1 text-[11px] md:text-[30px] font-light text-black/60">
             <span className="whitespace-nowrap">Don't have an account?</span>
             <button
-              onClick={() => window.location.href = '/signup'}
+              onClick={() => {
+                if (onSignupClick) {
+                  onSignupClick();
+                } else {
+                  window.location.href = '/signup';
+                }
+              }}
               className="text-black underline md:no-underline"
             >
               Sign up

@@ -3,101 +3,175 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AdminTopGreenHeader from '../../components/admin/AdminTopGreenHeader';
 import AdminLayout from '../../components/admin/AdminLayout';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import AdminTopBar from '../../components/admin/AdminTopBar';
+import StatCard from '../../components/admin/StatCard';
+import RecentOrdersTable, { RecentOrder } from '../../components/admin/RecentOrdersTable';
+import NewSellersList, { NewSeller } from '../../components/admin/NewSellersList';
+import LoadingState from '../../components/admin/LoadingState';
+import ErrorState from '../../components/admin/ErrorState';
 import Footer from '../../components/Footer';
-import searchIcon from '../../assets/images/searchicon.png';
-import { fetchNewSellers } from '../../services/adminService';
-import { AdminSeller } from '../../types/admin';
+import { 
+    fetchAdminDashboardOverview,
+    DashboardStats 
+} from '../../services/adminService';
 
 const AdminDashboard: React.FC = () => {
     const location = useLocation();
-    const [loading, setLoading] = useState(false);
-    const [sellers, setSellers] = useState<AdminSeller[]>([]);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
+    const [newSellers, setNewSellers] = useState<NewSeller[]>([]);
+
     useEffect(() => {
+        let mounted = true;
         const ac = new AbortController();
-        setLoading(true);
-        fetchNewSellers(ac.signal)
-            .then(setSellers)
-            .finally(() => setLoading(false));
-        return () => ac.abort();
+
+        (async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const overview = await fetchAdminDashboardOverview(ac.signal);
+                if (!mounted) return;
+                
+                setStats(overview.stats);
+                setRecentOrders(overview.recentOrders);
+                setNewSellers(overview.newSellers);
+            } catch (err: any) {
+                if (!mounted) return;
+                console.error('Failed to load admin dashboard:', err);
+                setError(err?.message || 'Failed to load dashboard data');
+                // Set defaults on error (backend-friendly)
+                setStats({
+                    totalUsers: 0,
+                    totalSellers: 0,
+                    totalOrders: 0,
+                    platformEarnings: 0,
+                });
+                setRecentOrders([]);
+                setNewSellers([]);
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
+            }
+        })();
+
+        return () => {
+            mounted = false;
+            ac.abort();
+        };
     }, []);
+
     const activeKey =
-        location.pathname.includes('/admin/edit-content') ? 'edit-content' :
-        location.pathname.includes('/admin/transactions') ? 'see-transaction' :
-        'new-sellers';
-	return (
-		<div className="min-h-screen bg-white lg:bg-[#F0FFF7]">
-			<AdminTopGreenHeader />
+        location.pathname.includes('/admin/settings') ? 'settings' :
+        location.pathname.includes('/admin/transactions') ? 'payments' :
+        location.pathname.includes('/admin/buyers') ? 'users' :
+        location.pathname.includes('/admin/sellers') ? 'sellers' :
+        location.pathname.includes('/admin/orders') ? 'orders' :
+        location.pathname.includes('/admin/payments') ? 'payments' :
+        location.pathname.includes('/admin/settings') ? 'settings' :
+        'dashboard';
+
+    const handleMenuClick = (key: string) => {
+        switch (key) {
+            case 'dashboard':
+                navigate('/admin/dashboard');
+                break;
+            case 'users':
+                navigate('/admin/buyers');
+                break;
+            case 'sellers':
+                navigate('/admin/sellers');
+                break;
+            case 'orders':
+                navigate('/admin/orders');
+                break;
+            case 'payments':
+                navigate('/admin/payments');
+                break;
+            case 'settings':
+                navigate('/admin/settings');
+                break;
+            default:
+                break;
+        }
+    };
+
+    // Import stat card icons
+    const usersIcon = require('../../assets/images/Admin/ad-state-user.png');
+    const sellersIcon = require('../../assets/images/Admin/ad-state-seller.png');
+    const ordersIcon = require('../../assets/images/Admin/ad-state-orders.png');
+    const earningsIcon = require('../../assets/images/Admin/ad-earning.png');
+
+    return (
+        <div className="min-h-screen bg-white">
+            <AdminTopGreenHeader />
             <AdminLayout
-                sidebar={<AdminSidebar 
-                    topLogoSrc={require('../../assets/images/Carriya logo 1.png')}
-                    bottomLogoSrc={require('../../assets/images/Carriya logo 1.png')}
-                    activeKey={activeKey}
-                    onMenuClick={(key) => {
-                        if (key === 'new-sellers') navigate('/admin/dashboard');
-                        if (key === 'edit-content') navigate('/admin/edit-content');
-                        if (key === 'see-transaction') navigate('/admin/transactions');
-                    }}
-                />}
-				header={(
-					<div className="w-full h-[120px] md:h-[150px] flex items-center px-4 md:px-6">
-						<div
-							className="w-full flex items-center bg-white rounded-[12px] md:rounded-[15px]"
-							style={{
-								maxWidth: 971,
-								height: 56,
-								borderWidth: 1.5,
-								borderStyle: 'solid',
-								borderColor: '#DADADA',
-								boxShadow: '2px 2px 5px 0px rgba(246, 246, 246, 1)',
-								paddingLeft: 14,
-								paddingRight: 12
-							}}
-						>
-							<input
-								type="text"
-								placeholder="Search For Sellers"
-								className="flex-1 outline-none "
-								style={{ color: '#A9A9A9', fontFamily: 'Roboto', fontWeight: 500, fontSize: 16 }}
-							/>
-							<div
-								className="flex items-center justify-center bg-[#2ECC71] rounded-[10px]"
-								style={{ width: 48, height: 42, marginLeft: 'auto' }}
-							>
-								<img src={searchIcon} alt="Search" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-							</div>
-						</div>
-					</div>
-				)}
-			>
-				<div className="px-4 md:px-6 pb-10">
-					<div className="grid gap-4 md:gap-[31px]">
-						{(loading ? [] : sellers).map((seller) => (
-							<div
-								key={seller.id}
-								className="w-full max-w-[982px] bg-white rounded-[12px] md:rounded-[10px] border border-[#E5E7EB] md:border-transparent shadow-sm md:shadow-none flex md:flex-row flex-col md:items-center"
-								style={{ padding: 16 }}
-							>
-								<div className="flex items-center md:items-center gap-3 md:gap-6">
-									<div className="hidden md:block text-[15px] font-medium text-black">New Seller</div>
-									<div className="md:ml-0 text-[16px] md:text-[15px] text-black font-semibold">{seller.firstName} {seller.lastName}</div>
-								</div>
-								<div className="mt-3 md:mt-0 md:ml-auto flex">
-									<button
-										onClick={() => navigate(`/admin/sellers/${seller.id}`)}
-										className="bg-[#2ECC71] text-white rounded-[8px] md:rounded-[5px] font-medium flex items-center justify-center w-full md:w-[177px] h-[40px] md:h-[36px] text-[16px] md:text-[20px]"
-									>
-										See Details
-									</button>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-			</AdminLayout>
-			<Footer />
-		</div>
-	);
+                sidebar={
+                    <AdminSidebar 
+                        topLogoSrc={require('../../assets/images/Carriya logo 1.png')}
+                        activeKey={activeKey}
+                        onMenuClick={handleMenuClick}
+                    />
+                }
+                header={<AdminTopBar title="Dashboard" />}
+            >
+                <div className="bg-white" style={{ paddingTop: 32, paddingBottom: 32, paddingLeft: 32, paddingRight: 32 }}>
+                    {loading ? (
+                        <LoadingState message="Loading dashboard..." />
+                    ) : error ? (
+                        <ErrorState 
+                            message={error} 
+                            onRetry={() => window.location.reload()} 
+                        />
+                    ) : (
+                        <div className="flex flex-col gap-8" style={{ gap: 32 }}>
+                            {/* Stats Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8" style={{ gap: 24 }}>
+                                <StatCard 
+                                    title="Total Users" 
+                                    value={stats?.totalUsers.toLocaleString('en-PK') || '0'} 
+                                    icon={usersIcon}
+                                    iconBgColor="#F0FDF4"
+                                />
+                                <StatCard 
+                                    title="Total Sellers" 
+                                    value={stats?.totalSellers.toLocaleString('en-PK') || '0'} 
+                                    icon={sellersIcon}
+                                    iconBgColor="#F0FDF4"
+                                />
+                                <StatCard 
+                                    title="Total Orders" 
+                                    value={stats?.totalOrders.toLocaleString('en-PK') || '0'} 
+                                    icon={ordersIcon}
+                                    iconBgColor="#F0FDF4"
+                                />
+                                <StatCard 
+                                    title="Platform Earnings" 
+                                    value={`PKR ${stats?.platformEarnings.toLocaleString('en-PK') || '0'}`} 
+                                    icon={earningsIcon}
+                                    iconBgColor="#F0FDF4"
+                                />
+                            </div>
+
+                            {/* Recent Orders and New Sellers */}
+                            <div className="flex flex-col gap-6 lg:gap-8">
+                                <div className="w-full">
+                                    <RecentOrdersTable orders={recentOrders} />
+                                </div>
+                                <div className="w-full">
+                                    <NewSellersList sellers={newSellers} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </AdminLayout>
+            <Footer />
+        </div>
+    );
 };
 
 export default AdminDashboard;

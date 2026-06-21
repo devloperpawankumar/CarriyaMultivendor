@@ -21,6 +21,7 @@ export interface SalesTrend {
   xAxisLabels: string[];
   primarySeries: TrendPoint[];
   secondarySeries?: TrendPoint[];
+  totalOrders?: number;
 }
 
 export interface TopProductRow {

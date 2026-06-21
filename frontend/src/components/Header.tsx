@@ -10,6 +10,7 @@ import menuIcon from "../assets/images/MENU.png";
 import CategoryMenu from "./CategoryMenu";
 import { useCart } from "../contexts/CartContext";
 import { useFavorites } from "../contexts/FavoritesContext";
+import { useAuth } from "../contexts/AuthContext";
 import { useClickOutside } from "../hooks/useClickOutside";
 
 
@@ -21,14 +22,18 @@ function Header({ variant = 'simple' }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const { getItemCount } = useCart();
   const { count: favCount } = useFavorites();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const cartItemCount = getItemCount();
   const headerRef = useRef<HTMLElement | null>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const menuButtonRef = useRef<HTMLDivElement | null>(null);
   const menuDropdownRef = useRef<HTMLDivElement | null>(null);
+  const accountDropdownRef = useRef<HTMLDivElement | null>(null);
+  const accountButtonRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!headerRef.current) return;
@@ -57,6 +62,35 @@ function Header({ variant = 'simple' }: HeaderProps) {
     eventType: 'mousedown',
   });
 
+  useClickOutside(() => setIsAccountDropdownOpen(false), {
+    enabled: isAccountDropdownOpen,
+    include: [accountButtonRef, accountDropdownRef],
+    escapeCloses: true,
+    eventType: 'mousedown',
+  });
+
+  const handleLogout = async () => {
+    await logout();
+    setIsAccountDropdownOpen(false);
+    navigate('/');
+  };
+
+  // Get user display name (memoized for performance)
+  const getUserDisplayName = React.useCallback(() => {
+    if (!user) return 'Account';
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user.firstName) return user.firstName;
+    if (user.email) {
+      // Get username part before @ symbol
+      const username = user.email.split('@')[0];
+      // Capitalize first letter
+      return username.charAt(0).toUpperCase() + username.slice(1);
+    }
+    return 'Account';
+  }, [user]);
+
   return (
     <>
     <header ref={headerRef} className="w-full fixed top-0 inset-x-0 z-40">
@@ -73,7 +107,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
         <div className={`max-w-7xl mx-auto px-4 md:px-8 ${isScrolled ? 'py-2 md:py-3' : 'py-3 md:py-4'}` }>
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center">
+            <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
               <img
                 src={logoImg}
                 alt="Carriya Logo"
@@ -130,6 +164,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
                 )}
               </button>
 
+              {/* Account/User Name - First Row */}
               <div className="hidden md:flex items-center space-x-2">
                 <img
                   src={userIcon}
@@ -137,7 +172,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
                   className="w-6 h-6 object-contain"
                 />
                 <span className={`text-carriya-dark font-medium text-sm ${isScrolled ? 'md:text-base' : 'md:text-lg'}`}>
-                  Account
+                  {isAuthenticated && user ? getUserDisplayName() : 'Account'}
                 </span>
               </div>
 
@@ -181,20 +216,200 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
               {/* Action Buttons */}
               <div className="flex items-center space-x-3">
-                <button 
-                  onClick={() => navigate('/signup')}
-                  className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100"
-                >
-                  Sign-Up
-                </button>
-                <button className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100" 
-                onClick={()=>navigate("/login")}>Log-In</button>
-                <button 
-                  onClick={() => navigate('/seller-signup')}
-                  className="bg-carriya-dark text-white px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-800"
-                >
-                  Become a seller
-                </button>
+                {!isAuthenticated ? (
+                  <>
+                    <button 
+                      onClick={() => navigate('/signup')}
+                      className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100"
+                    >
+                      Sign-Up
+                    </button>
+                    <button 
+                      className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100" 
+                      onClick={() => navigate("/login")}
+                    >
+                      Log-In
+                    </button>
+                  </>
+                ) : (
+                  <div className="relative" ref={accountButtonRef}>
+                    <button
+                      onClick={() => setIsAccountDropdownOpen(!isAccountDropdownOpen)}
+                      className="bg-white text-carriya-dark px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-100 flex items-center space-x-1"
+                    >
+                      <span>Manage Account</span>
+                      <svg
+                        className={`w-4 h-4 transition-transform ${isAccountDropdownOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {/* Manage Account Dropdown */}
+                    {isAccountDropdownOpen && (
+                      <div
+                        ref={accountDropdownRef}
+                        className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                      >
+                        <div className="px-4 py-3 border-b border-gray-200">
+                          <p className="text-sm font-semibold text-gray-900">
+                            {getUserDisplayName()}
+                          </p>
+                          {user?.email && (
+                            <p className="text-xs text-gray-500 mt-1">{user.email}</p>
+                          )}
+                          {user?.role && (
+                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded bg-green-100 text-green-800">
+                              {user.role === 'seller' ? 'Seller' : user.role === 'admin' ? 'Admin' : 'Buyer'}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Seller-specific menu items */}
+                        {user?.role === 'seller' && (
+                          <>
+                            <Link
+                              to="/seller/dashboard"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors font-medium"
+                            >
+                              📊 Seller Dashboard
+                            </Link>
+                            <Link
+                              to="/seller/manage-products"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Products
+                            </Link>
+                            <Link
+                              to="/seller/manage-orders"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Orders
+                            </Link>
+                            <Link
+                              to="/seller/manage-payments"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Payments
+                            </Link>
+                            <Link
+                              to="/seller/settings"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Settings
+                            </Link>
+                            <div className="border-t border-gray-200 my-2"></div>
+                          </>
+                        )}
+
+                        {/* Admin-specific menu items */}
+                        {user?.role === 'admin' && (
+                          <>
+                            <Link
+                              to="/admin/dashboard"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors font-medium"
+                            >
+                              📊 Dashboard
+                            </Link>
+                            <Link
+                              to="/admin/orders"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Orders
+                            </Link>
+                            <Link
+                              to="/admin/payments"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Payments
+                            </Link>
+                            <Link
+                              to="/admin/sellers"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Sellers
+                            </Link>
+                            <Link
+                              to="/admin/buyers"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              Buyers
+                            </Link>
+                          
+                            <div className="border-t border-gray-200 my-2"></div>
+                          </>
+                        )}
+
+                        {/* Buyer-specific menu items */}
+                        {user?.role === 'buyer' && (
+                          <>
+                            <Link
+                              to="/manage-account"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors font-medium"
+                            >
+                              ⚙️ Manage Account
+                            </Link>
+                            <div className="border-t border-gray-200 my-1"></div>
+                            <Link
+                              to="/my-orders"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              My Orders
+                            </Link>
+                            <Link
+                              to="/favorites"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                              My Favorites
+                            </Link>
+                          </>
+                        )}
+
+                        {/* Common items for all users */}
+                        <div className="border-t border-gray-200 mt-2 pt-2">
+                          <button
+                            onClick={handleLogout}
+                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors"
+                          >
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {/* Show "Become a seller" only if user is NOT already a seller */}
+                {!isAuthenticated || (user && user.role !== 'seller' && user.role !== 'admin') ? (
+                  <button 
+                    onClick={() => navigate('/seller-signup')}
+                    className="bg-carriya-dark text-white px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-800"
+                  >
+                    Become a seller
+                  </button>
+                ) : user?.role === 'seller' ? (
+                  <button 
+                    onClick={() => navigate('/seller/dashboard')}
+                    className="bg-carriya-dark text-white px-4 py-2 rounded-lg font-medium text-xs hover:bg-gray-800"
+                  >
+                    Seller Dashboard
+                  </button>
+                ) : null}
               </div>
             </div>
 
@@ -242,6 +457,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
       {/* Menu Links */}
       <NavLink
         to="/"
+        onClick={() => setIsMobileMenuOpen(false)}
         className={({ isActive }) =>
           isActive
             ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
@@ -253,6 +469,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
       <NavLink
         to="/my-orders"
+        onClick={() => setIsMobileMenuOpen(false)}
         className={({ isActive }) =>
           isActive
             ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
@@ -264,6 +481,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
       <NavLink
         to="/blog"
+        onClick={() => setIsMobileMenuOpen(false)}
         className={({ isActive }) =>
           isActive
             ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
@@ -275,6 +493,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
       <NavLink
         to="/about"
+        onClick={() => setIsMobileMenuOpen(false)}
         className={({ isActive }) =>
           isActive
             ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
@@ -286,6 +505,7 @@ function Header({ variant = 'simple' }: HeaderProps) {
 
       <NavLink
         to="/contact-us"
+        onClick={() => setIsMobileMenuOpen(false)}
         className={({ isActive }) =>
           isActive
             ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
@@ -295,41 +515,157 @@ function Header({ variant = 'simple' }: HeaderProps) {
         Contact Us
       </NavLink>
 
-      <NavLink
-        to="/seller-signup"
-        className={({ isActive }) =>
-          isActive
-            ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
-            : "block font-medium"
-        }
-      >
-        Sell
-      </NavLink>
+      {/* Show "Sell" link only if user is NOT a seller */}
+      {(!isAuthenticated || (user && user.role !== 'seller' && user.role !== 'admin')) && (
+        <NavLink
+          to="/seller-signup"
+          onClick={() => setIsMobileMenuOpen(false)}
+          className={({ isActive }) =>
+            isActive
+              ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
+              : "block font-medium"
+          }
+        >
+          Sell
+        </NavLink>
+      )}
 
-      {/* Footer Buttons */}
-      <div className="pt-4 border-t flex items-center gap-2">
+      {/* Seller Dashboard Link - Show only if seller */}
+      {user?.role === 'seller' && (
         <NavLink
-          to="/login"
+          to="/seller/dashboard"
+          onClick={() => setIsMobileMenuOpen(false)}
           className={({ isActive }) =>
             isActive
-              ? "text-green-600 font-semibold border-b border-green-600"
-              : "text-green-600 font-medium"
+              ? "block font-semibold text-green-600 border-b border-green-600 w-fit"
+              : "block font-medium"
           }
         >
-          Sign in
+          📊 Seller Dashboard
         </NavLink>
-        <span>or</span>
-        <NavLink
-          to="/signup"
-          className={({ isActive }) =>
-            isActive
-              ? "text-green-600 font-semibold border-b border-green-600"
-              : "text-green-600 font-medium"
-          }
-        >
-          Register
-        </NavLink>
-      </div>
+      )}
+
+      {/* Account Section for Mobile */}
+      {isAuthenticated && user ? (
+        <div className="pt-4 border-t">
+          <div className="px-4 py-2 mb-2">
+            <p className="text-sm font-semibold text-gray-900">
+              {getUserDisplayName()}
+            </p>
+            {user.email && (
+              <p className="text-xs text-gray-500 mt-1">{user.email}</p>
+            )}
+            {user.role && (
+              <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded bg-green-100 text-green-800">
+                {user.role === 'seller' ? 'Seller' : user.role === 'admin' ? 'Admin' : 'Buyer'}
+              </span>
+            )}
+          </div>
+          
+          {/* Seller menu items */}
+          {user.role === 'seller' && (
+            <>
+              <NavLink
+                to="/seller/manage-products"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? "block px-4 py-2 font-semibold text-green-600 border-b border-green-600 w-fit"
+                    : "block px-4 py-2 font-medium"
+                }
+              >
+                Products
+              </NavLink>
+              <NavLink
+                to="/seller/manage-orders"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? "block px-4 py-2 font-semibold text-green-600 border-b border-green-600 w-fit"
+                    : "block px-4 py-2 font-medium"
+                }
+              >
+                Orders
+              </NavLink>
+              <NavLink
+                to="/seller/settings"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? "block px-4 py-2 font-semibold text-green-600 border-b border-green-600 w-fit"
+                    : "block px-4 py-2 font-medium"
+                }
+              >
+                Settings
+              </NavLink>
+            </>
+          )}
+
+          {/* Buyer menu items */}
+          {user.role === 'buyer' && (
+            <>
+              <NavLink
+                to="/manage-account"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? "block px-4 py-2 font-semibold text-green-600 border-b border-green-600 w-fit"
+                    : "block px-4 py-2 font-medium"
+                }
+              >
+                Manage Account
+              </NavLink>
+              <NavLink
+                to="/favorites"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? "block px-4 py-2 font-semibold text-green-600 border-b border-green-600 w-fit"
+                    : "block px-4 py-2 font-medium"
+                }
+              >
+                My Favorites
+              </NavLink>
+            </>
+          )}
+          
+          <button
+            onClick={() => {
+              handleLogout();
+              setIsMobileMenuOpen(false);
+            }}
+            className="block px-4 py-2 text-red-600 font-medium mt-2"
+          >
+            Logout
+          </button>
+        </div>
+      ) : (
+        <div className="pt-4 border-t flex items-center gap-2">
+          <NavLink
+            to="/login"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              isActive
+                ? "text-green-600 font-semibold border-b border-green-600"
+                : "text-green-600 font-medium"
+            }
+          >
+            Sign in
+          </NavLink>
+          <span>or</span>
+          <NavLink
+            to="/signup"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              isActive
+                ? "text-green-600 font-semibold border-b border-green-600"
+                : "text-green-600 font-medium"
+            }
+          >
+            Register
+          </NavLink>
+        </div>
+      )}
     </nav>
           </div>
         )}
